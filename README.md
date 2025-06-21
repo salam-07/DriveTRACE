@@ -2,15 +2,14 @@
 **Traffic Replication And Control Environment**
 <br>
 A real-world traffic simulation to replicate traffic flow from actual routes, providing a learning environment and constant feedback.
-
----
+<br>
 
 # Overview
 **DriveTRACE** is a real world traffic simulation system designed to help beginner drivers safely practice driving in a realistic, natural traffic flow. The system uses computer vision techniques to classify, detect, and trace vehicle paths from highway footage over a period of time. These vehicle patterns are replicated in a simulation environment, complete with real-time feedback on driving behaviour of the user.
 <br>
 The platform aims to provide a risk-free, but realistic experience with local traffic. Having the freedom to simulate driving on various times and days, equips them with enough confidence to drive safely.
 
----
+<br>
 
 # Features
 - **Real-time vehicle detection and classification** using YOLO and OpenCV
