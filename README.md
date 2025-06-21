@@ -3,6 +3,7 @@
 <br>
 A real-world traffic simulation to replicate traffic flow from actual routes, providing a learning environment and constant feedback.
 
+![screenshot](Docs/Images/Cover%20Image%20copy.jpg)
 <br>
 
 # Overview
