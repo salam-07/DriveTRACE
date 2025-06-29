@@ -2,10 +2,9 @@ import pygame
 import random
 import os
 from config import *
-from traffic_data_loader import load_traffic_data
 
 class TrafficVehicle:
-    def __init__(self, lane, world_y, speed):
+    def __init__(self, lane, world_y, speed=None):
         vehicle_files = [f for f in os.listdir('Assets/vehicles') 
                         if f.startswith('car_') and f != 'car_17.png']
         vehicle_image = random.choice(vehicle_files)
@@ -17,7 +16,7 @@ class TrafficVehicle:
         self.rect = self.image.get_rect()
         self.lane = lane
         self.world_y = world_y
-        self.speed = speed
+        self.speed = speed if speed is not None else random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
         self.is_player_lane = False
 
     def update(self, player_speed, player_lane):
@@ -42,41 +41,31 @@ class TrafficManager:
     def __init__(self):
         self.vehicles = []
         self.enabled = False
-        self.traffic_data = load_traffic_data()
         self.spawn_distance = 4000
         self.despawn_distance = 2000
 
     def toggle(self):
         self.enabled = not self.enabled
         if self.enabled and not self.vehicles:
-            self.spawn_vehicles_from_data()
+            self.spawn_default_traffic()
 
-    def spawn_vehicles_from_data(self):
+    def spawn_default_traffic(self):
         self.vehicles = []
-        # Only spawn vehicles within a window around the player's starting world_y
-        player_start_y = 0
-        window = 2000  # Only spawn vehicles within ±2000 units
-        count = 0
-        for entry in self.traffic_data:
-            world_y = entry['world_y']
-            if player_start_y - window <= world_y <= player_start_y + window:
-                lane = entry['lane']
-                speed = entry['speed']
+        min_gap = 80
+        for lane in range(LANE_COUNT):
+            for i in range(20):
+                world_y = random.uniform(-2000, 4000)
+                speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
                 self.vehicles.append(TrafficVehicle(lane, world_y, speed))
-                count += 1
-            if count > 100:  # Hard cap to prevent overload
-                break
 
     def update(self, player_speed, player_lane, player_world_y):
         if self.enabled:
             for vehicle in self.vehicles:
                 vehicle.update(player_speed, player_lane)
-            # Despawn and respawn vehicles far ahead/behind
             for vehicle in self.vehicles:
                 if vehicle.world_y < player_world_y - self.despawn_distance:
-                    # Respawn at max world_y from CSV + offset
-                    max_y = max(v.world_y for v in self.vehicles)
-                    vehicle.world_y = max_y + 100
+                    vehicle.world_y = player_world_y + self.spawn_distance
+                    vehicle.speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
 
     def draw(self, screen, player_world_y, center_y):
         if self.enabled:
