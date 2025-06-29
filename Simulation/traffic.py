@@ -14,7 +14,7 @@ class TrafficVehicle:
         # Scale the image
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
         new_height = int((new_width / self.original_image.get_width()) * self.original_image.get_height())
-        self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
+        self.image = pygame.transform.smoothscale(self.original_image, (new_width, new_height))
         
         # Position the vehicle
         self.rect = self.image.get_rect()

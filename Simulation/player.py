@@ -8,7 +8,7 @@ class Player:
         # Scale the image based on lane width
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
         new_height = int((new_width / self.original_image.get_width()) * self.original_image.get_height())
-        self.original_image = pygame.transform.scale(self.original_image, (new_width, new_height))
+        self.original_image = pygame.transform.smoothscale(self.original_image, (new_width, new_height))
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
