@@ -11,36 +11,26 @@ class Player:
         self.original_image = pygame.transform.smoothscale(self.original_image, (new_width, new_height))
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.lane = LANE_COUNT // 2  # Start in the center lane
-        self.target_lane = self.lane
-        self.lane_pos = float(self.lane)
-        self.lane_changing = False
-        self.angle = 0
+        self.x = (LANE_COUNT // 2 + 0.5) * LANE_WIDTH
+        self.y = 0  # world y
+        self.angle = 0  # visual angle
+        self.heading = 0  # direction in degrees
         self.speed = 0
         self.target_speed = 0
         self.acceleration = 0
-        self.turning = 0
         self.last_keys = None
-        self.world_y = 0  # Player's world position (centered)
 
     def handle_input(self, keys):
         # Speed control with number keys
         for i in range(10):
             if keys[getattr(pygame, f'K_{i}')]:
                 self.target_speed = (i / 9) * MAX_SPEED
-
-        # Lane change logic: only trigger on key press, not hold
-        if self.last_keys is None:
-            self.last_keys = keys
-        if keys[pygame.K_LEFT] and not self.last_keys[pygame.K_LEFT] and self.target_lane > 0 and not self.lane_changing:
-            self.target_lane -= 1
-            self.lane_changing = True
-            self.turning = 1
-        elif keys[pygame.K_RIGHT] and not self.last_keys[pygame.K_RIGHT] and self.target_lane < LANE_COUNT - 1 and not self.lane_changing:
-            self.target_lane += 1
-            self.lane_changing = True
-            self.turning = -1
-        self.last_keys = keys
+        steer = 0
+        if keys[pygame.K_LEFT]:
+            steer -= 1
+        if keys[pygame.K_RIGHT]:
+            steer += 1
+        self.steer = steer
 
     def update(self):
         # Update speed with smooth acceleration
@@ -51,39 +41,36 @@ class Player:
             self.speed = max(MIN_SPEED, min(MAX_SPEED, self.speed))
         else:
             self.acceleration = 0
-
-        # Move player in world
-        self.world_y += self.speed * (1/FPS)
-
-        # Lane change animation
-        if self.lane_changing:
-            lane_delta = self.target_lane - self.lane_pos
-            move_step = min(abs(lane_delta), 4 * (1/FPS)) * (1 if lane_delta > 0 else -1)
-            self.lane_pos += move_step
-            # Tilt car during lane change
-            self.angle = -20 * self.turning * (1 - abs(self.target_lane - self.lane_pos))
-            if abs(self.lane_pos - self.target_lane) < 0.05:
-                self.lane_pos = self.target_lane
-                self.lane = self.target_lane
-                self.lane_changing = False
-                self.angle = 0
-                self.turning = 0
-        else:
-            self.angle *= 0.8  # Smoothly return to straight
+        # Update heading based on steering and speed
+        if self.speed > 5:
+            self.heading += self.steer * TURNING_SPEED * (self.speed / MAX_SPEED)
+        # Clamp heading to ±45 degrees
+        self.heading = max(-45, min(45, self.heading))
+        # Use full speed for both x and y (no slowdown when turning)
+        rad = math.radians(self.heading)
+        dx = math.sin(rad) * self.speed * (1/FPS)
+        dy = math.cos(rad) * self.speed * (1/FPS)
+        self.x += dx
+        self.y += dy
+        self.world_y = self.y
+        # Clamp to road boundaries
+        min_x = self.rect.width // 2
+        max_x = WINDOW_WIDTH - self.rect.width // 2
+        self.x = max(min_x, min(max_x, self.x))
+        # Visual angle for car tilt
+        self.angle = -self.steer * TURNING_ANGLE * (self.speed / MAX_SPEED)
 
     def get_lane(self):
-        return int(round(self.lane_pos))
+        # Return closest lane index
+        return int(self.x // LANE_WIDTH)
 
     def draw(self, screen, center_x, center_y):
-        # Draw player at the center of the screen
-        base_x = int((self.lane_pos + 0.5) * LANE_WIDTH)
-        base_y = center_y
-        self.rect.centerx = base_x
-        self.rect.centery = base_y
-
-        # Rotate image with anti-aliasing
+        # Draw player at (self.x, center_y)
+        draw_x = int(self.x)
+        draw_y = center_y
+        self.rect.centerx = draw_x
+        self.rect.centery = draw_y
         self.image = pygame.transform.rotozoom(self.original_image, self.angle, 1)
         new_rect = self.image.get_rect(center=self.rect.center)
         self.rect = new_rect
-
         screen.blit(self.image, self.rect)
