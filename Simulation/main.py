@@ -35,22 +35,19 @@ class Game:
 
     def update(self):
         self.player.update()
-        self.traffic_manager.update()
-        
-        # Update road scroll position
-        self.road_y_offset = (self.road_y_offset + self.player.speed * (1/FPS)) % ROAD_TILE_HEIGHT
+        self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
+        # Update road scroll position (now based on player world_y)
+        self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 
     def draw(self):
         self.screen.fill(BLACK)
-
-        # Draw road tiles with scrolling
-        for y in range(-1, 2):
-            tile_y = y * ROAD_TILE_HEIGHT + self.road_y_offset
+        center_y = int(WINDOW_HEIGHT * 0.8)
+        # Draw road tiles with scrolling, centered on player
+        for y in range(-1, 3):
+            tile_y = y * ROAD_TILE_HEIGHT + center_y - self.road_y_offset
             self.screen.blit(self.road_tile, (0, tile_y))
-
-        self.traffic_manager.draw(self.screen)
-        self.player.draw(self.screen)
-        
+        self.traffic_manager.draw(self.screen, self.player.world_y, center_y)
+        self.player.draw(self.screen, int((self.player.lane_pos + 0.5) * LANE_WIDTH), center_y)
         pygame.display.flip()
 
     def run(self):
