@@ -18,8 +18,10 @@ class TrafficVehicle:
         self.rect = self.image.get_rect()
         self.lane = lane
         self.world_y = world_y
-        # Set random speed within range, or use provided
-        self.speed = speed if speed is not None else random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+        # Cluster traffic speeds for realism, with some jitter
+        base_speed = speed if speed is not None else random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+        self.speed = base_speed + random.uniform(-10, 10)
+        self.jitter = random.uniform(-2, 2)
         self.is_player_lane = False
 
     def update(self, player_speed, player_lane):
@@ -29,7 +31,8 @@ class TrafficVehicle:
             self.speed += (player_speed - self.speed) * 0.1
         else:
             self.is_player_lane = False
-        self.world_y += self.speed * (1/FPS)
+        # Move traffic relative to player (subtract player speed)
+        self.world_y -= (player_speed - self.speed + self.jitter) * (1/FPS)
 
     def get_screen_pos(self, player_world_y, center_y):
         # Calculate screen y based on world position relative to player
@@ -46,8 +49,8 @@ class TrafficManager:
     def __init__(self):
         self.vehicles = []
         self.enabled = False
-        self.spawn_distance = 2000  # How far ahead to spawn traffic
-        self.despawn_distance = 1000  # How far behind player to despawn
+        self.spawn_distance = 4000  # Increased spawn range
+        self.despawn_distance = 2000  # Increased despawn range
 
     def toggle(self):
         self.enabled = not self.enabled
@@ -57,13 +60,16 @@ class TrafficManager:
     def spawn_initial_vehicles(self, player_world_y):
         # Spawn vehicles in each lane, spaced apart to avoid overlap
         self.vehicles = []
-        min_gap = 120  # Minimum vertical gap between vehicles
+        min_gap = 80  # More vehicles, closer together
         for lane in range(LANE_COUNT):
-            y_positions = [player_world_y + i * min_gap for i in range(-10, 20)]
+            y_positions = [player_world_y + i * min_gap for i in range(-25, 50)]
             random.shuffle(y_positions)
-            for i in range(6):  # 6 vehicles per lane
+            for i in range(20):  # 20 vehicles per lane
                 world_y = y_positions[i]
-                speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+                # Cluster some vehicles at similar speeds for realism
+                if i % 5 == 0:
+                    base_speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+                speed = base_speed + random.uniform(-8, 8)
                 self.vehicles.append(TrafficVehicle(lane, world_y, speed))
 
     def update(self, player_speed, player_lane, player_world_y):
@@ -77,8 +83,8 @@ class TrafficManager:
                 for i in range(1, len(lane_vehicles)):
                     prev = lane_vehicles[i-1]
                     curr = lane_vehicles[i]
-                    if curr.world_y - prev.world_y < 60:
-                        curr.world_y = prev.world_y + 60
+                    if curr.world_y - prev.world_y < 50:
+                        curr.world_y = prev.world_y + 50
             # Despawn and respawn vehicles far ahead/behind
             for vehicle in self.vehicles:
                 if vehicle.world_y < player_world_y - self.despawn_distance:
