@@ -1,0 +1,29 @@
+#for traffic speeds and behavior control
+
+# Game configuration settings
+
+# Window settings
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+FPS = 60
+
+# Road settings
+ROAD_TILE_WIDTH = 800  # Width of road tile
+ROAD_TILE_HEIGHT = 800  # Height of road tile
+LANE_COUNT = 4
+LANE_WIDTH = ROAD_TILE_WIDTH / LANE_COUNT
+
+# Vehicle settings
+VEHICLE_SCALE = 0.5  # Scale factor for vehicle sprites
+MAX_SPEED = 300  # pixels per second
+MIN_SPEED = 0
+ACCELERATION_RATE = 50  # pixels per second squared
+TURNING_SPEED = 2  # degrees per frame
+TRAFFIC_SPEED_RANGE = (100, 200)  # Min and max speed for traffic vehicles
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
