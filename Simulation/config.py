@@ -19,7 +19,7 @@ MAX_SPEED = 300  # pixels per second
 MIN_SPEED = 0
 ACCELERATION_RATE = 50  # pixels per second squared
 TURNING_SPEED = 2  # degrees per frame
-TRAFFIC_SPEED_RANGE = (100, 200)  # Min and max speed for traffic vehicles
+TRAFFIC_SPEED_RANGE = (100, 250)  # Min and max speed for traffic vehicles
 
 # Colors
 BLACK = (0, 0, 0)
