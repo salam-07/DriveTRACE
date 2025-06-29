@@ -43,8 +43,8 @@ class Game:
         self.screen.fill(BLACK)
         center_y = int(WINDOW_HEIGHT * 0.8)
         # Draw road tiles with scrolling, centered on player
-        for y in range(-1, 3):
-            tile_y = y * ROAD_TILE_HEIGHT + center_y - self.road_y_offset
+        for y in range(-3, 3):
+            tile_y = y * ROAD_TILE_HEIGHT + center_y + self.road_y_offset
             self.screen.blit(self.road_tile, (0, tile_y))
         self.traffic_manager.draw(self.screen, self.player.world_y, center_y)
         self.player.draw(self.screen, int((self.player.lane_pos + 0.5) * LANE_WIDTH), center_y)

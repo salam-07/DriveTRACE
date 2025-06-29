@@ -53,11 +53,19 @@ class TrafficManager:
 
     def spawn_vehicles_from_data(self):
         self.vehicles = []
+        # Only spawn vehicles within a window around the player's starting world_y
+        player_start_y = 0
+        window = 2000  # Only spawn vehicles within ±2000 units
+        count = 0
         for entry in self.traffic_data:
-            lane = entry['lane']
             world_y = entry['world_y']
-            speed = entry['speed']
-            self.vehicles.append(TrafficVehicle(lane, world_y, speed))
+            if player_start_y - window <= world_y <= player_start_y + window:
+                lane = entry['lane']
+                speed = entry['speed']
+                self.vehicles.append(TrafficVehicle(lane, world_y, speed))
+                count += 1
+            if count > 100:  # Hard cap to prevent overload
+                break
 
     def update(self, player_speed, player_lane, player_world_y):
         if self.enabled:
