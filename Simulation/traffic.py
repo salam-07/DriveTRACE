@@ -6,7 +6,7 @@ from config import *
 class TrafficVehicle:
     def __init__(self, lane, world_y, speed=None):
         vehicle_files = [f for f in os.listdir('Assets/vehicles') 
-                        if f.startswith('car_') and f != 'car_17.png']
+                        if f.startswith('car_')]
         vehicle_image = random.choice(vehicle_files)
         self.original_image = pygame.image.load(f'Assets/vehicles/{vehicle_image}').convert_alpha()
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
@@ -22,7 +22,7 @@ class TrafficVehicle:
     def update(self, player_speed, player_lane):
         if self.lane == player_lane:
             self.is_player_lane = True
-            self.speed += (player_speed - self.speed) * 0.1
+            self.speed += (player_speed - self.speed) * (1/FPS) # Smoothly adjust speed towards player speed
         else:
             self.is_player_lane = False
         self.world_y -= (player_speed - self.speed) * (1/FPS)

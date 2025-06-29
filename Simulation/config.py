@@ -17,10 +17,10 @@ LANE_WIDTH = ROAD_TILE_WIDTH / LANE_COUNT
 VEHICLE_SCALE = 0.5  # Scale factor for vehicle sprites
 MAX_SPEED = 300  # pixels per second
 MIN_SPEED = 0
-ACCELERATION_RATE = 50  # pixels per second squared
+ACCELERATION_RATE = 70  # pixels per second squared
 TURNING_SPEED = 5  # degrees per frame
 TURNING_ANGLE = 7  # degrees per frame for player vehicle
-TRAFFIC_SPEED_RANGE = (100, 250)  # Min and max speed for traffic vehicles
+TRAFFIC_SPEED_RANGE = (170, 250)  # Min and max speed for traffic vehicles
 
 # Colors
 BLACK = (0, 0, 0)
