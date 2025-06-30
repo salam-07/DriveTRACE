@@ -42,7 +42,8 @@ class MainWindow(QWidget):
                 letter-spacing: 1px;
             }
             QPushButton:hover {
-                background: rgba(0,150,0,0.8);
+                background: rgba(200,200,200,0.8);
+                color = black;
             }
         """)
         self.launch_btn.clicked.connect(self.launch_simulation)
