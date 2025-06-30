@@ -5,10 +5,10 @@ from config import *
 
 class TrafficVehicle:
     def __init__(self, lane, world_y, speed=None):
-        vehicle_files = [f for f in os.listdir('Assets/vehicles') 
+        vehicle_files = [f for f in os.listdir(TRAFFIC_ASSET_DIR) 
                         if f.startswith('car_')]
         vehicle_image = random.choice(vehicle_files)
-        self.original_image = pygame.image.load(f'Assets/vehicles/{vehicle_image}').convert_alpha()
+        self.original_image = pygame.image.load(f'{TRAFFIC_ASSET_DIR}/{vehicle_image}').convert_alpha()
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
         new_height = int((new_width / self.original_image.get_width()) * self.original_image.get_height())
         self.original_image = pygame.transform.smoothscale(self.original_image, (new_width, new_height))

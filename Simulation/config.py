@@ -1,5 +1,5 @@
 #for traffic speeds and behavior control
-
+import os
 # Game configuration settings
 
 # Window settings
@@ -28,3 +28,11 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+
+# Asset paths
+PLAYER_CHOICE = 13
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(BASE_DIR, 'Assets')
+ROAD_ASSET_DIR = os.path.join(ASSETS_DIR, 'roads')
+PLAYER_TILE_ASSET = os.path.join(ASSETS_DIR, 'vehicles', f'car_{PLAYER_CHOICE}.png')
+TRAFFIC_ASSET_DIR = os.path.join(ASSETS_DIR, 'vehicles')

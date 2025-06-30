@@ -2,6 +2,9 @@ import csv
 import os
 from config import LANE_WIDTH
 
+#import data from CSV
+#not implemented
+
 TRAFFIC_CSV_PATH = os.path.join('Assets', 'traffic_data.csv')
 
 def load_traffic_data():

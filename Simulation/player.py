@@ -4,7 +4,7 @@ from config import *
 
 class Player:
     def __init__(self, x, y):
-        self.original_image = pygame.image.load('Assets/vehicles/car_13.png').convert_alpha()
+        self.original_image = pygame.image.load(PLAYER_TILE_ASSET).convert_alpha()
         # Smooth scaling for anti-aliasing
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
         new_height = int((new_width / self.original_image.get_width()) * self.original_image.get_height())
