@@ -11,12 +11,20 @@ MAIN_PY_PATH = os.path.join(os.path.dirname(__file__), "Simulation/main.py")
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        # Hide window title bar and set fixed size
+        # Get screen size
+        screen = QApplication.primaryScreen()
+        screen_size = screen.size()
+        screen_width = screen_size.width()
+        screen_height = screen_size.height()
+        # Maintain aspect ratio (1248:936)
+        aspect_ratio = 1248 / 936
+        window_height = int(screen_height * 0.94)
+        window_width = int(window_height * aspect_ratio)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setFixedSize(1248, 936)
+        self.setFixedSize(window_width, window_height)
         # Center the window on the screen
         qr = self.frameGeometry()
-        cp = QApplication.desktop().screen().rect().center()
+        cp = screen.geometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
@@ -29,7 +37,7 @@ class MainWindow(QWidget):
 
         # Launch Simulation Button
         self.launch_btn = QPushButton("Launch Simulation", self)
-        self.launch_btn.setGeometry(324, 140, 600, 110)
+        self.launch_btn.setGeometry(int((window_width-600)/2), 140, 600, 110)
         self.launch_btn.setStyleSheet("""
             QPushButton {
                 background: rgba(30,30,30,1.2);
@@ -50,7 +58,7 @@ class MainWindow(QWidget):
 
         # Quit Button just below the launch button
         self.quit_btn = QPushButton("Quit", self)
-        self.quit_btn.setGeometry(324, 270, 600, 110)
+        self.quit_btn.setGeometry(int((window_width-600)/2), 270, 600, 110)
         self.quit_btn.setStyleSheet("""
             QPushButton {
                 background: rgba(30,30,30,1.2);
