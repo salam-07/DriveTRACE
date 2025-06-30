@@ -1,6 +1,6 @@
 import sys
 import os
-from Simulation import *
+from Simulation import config
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
 from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush
 from PyQt5.QtCore import Qt
