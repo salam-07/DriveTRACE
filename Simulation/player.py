@@ -4,11 +4,19 @@ from config import *
 
 class Player:
     def __init__(self, x, y):
-        self.original_image = pygame.image.load(PLAYER_TILE_ASSET).convert_alpha()
-        # Smooth scaling for anti-aliasing
+        car_img = pygame.image.load(PLAYER_TILE_ASSET).convert_alpha()
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
-        new_height = int((new_width / self.original_image.get_width()) * self.original_image.get_height())
-        self.original_image = pygame.transform.smoothscale(self.original_image, (new_width, new_height))
+        new_height = int((new_width / car_img.get_width()) * car_img.get_height())
+        car_img = pygame.transform.smoothscale(car_img, (new_width, new_height))
+        # Create shadow
+        shadow_offset = 10
+        shadow_alpha = 100
+        shadow_img = pygame.Surface((new_width + shadow_offset*2, new_height + shadow_offset*2), pygame.SRCALPHA)
+        shadow = pygame.Surface((new_width, new_height), pygame.SRCALPHA)
+        pygame.draw.ellipse(shadow, (0,0,0,shadow_alpha), shadow.get_rect())
+        shadow_img.blit(shadow, (shadow_offset, new_height + shadow_offset//2))
+        shadow_img.blit(car_img, (shadow_offset, shadow_offset))
+        self.original_image = shadow_img
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.x = (LANE_COUNT // 2 + 0.5) * LANE_WIDTH
