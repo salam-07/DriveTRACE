@@ -15,7 +15,7 @@ LANE_WIDTH = ROAD_TILE_WIDTH / LANE_COUNT
 
 # Vehicle settings
 VEHICLE_SCALE = 0.55  # Scale factor for vehicle sprites
-MAX_SPEED = 300  # pixels per second
+MAX_SPEED = 370  # pixels per second
 MIN_SPEED = 0
 ACCELERATION_RATE = 70  # pixels per second squared
 TURNING_SPEED = 5  # degrees per frame
@@ -39,4 +39,4 @@ TRAFFIC_ASSET_DIR = os.path.join(ASSETS_DIR, 'vehicles')
 
 # Traffic settings
 TRAFFIC_DENSITY = 20  # Number of vehicles per lane
-TRAFFIC_SPEED_RANGE = (250, 400)  # Min and max speed for traffic vehicles
+TRAFFIC_SPEED_RANGE = (350, 500)  # Min and max speed for traffic vehicles
