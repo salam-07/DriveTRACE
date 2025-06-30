@@ -25,6 +25,8 @@ class Player:
         for i in range(10):
             if keys[getattr(pygame, f'K_{i}')]:
                 self.target_speed = (i / 9) * MAX_SPEED
+            if keys[pygame.K_DOWN]:
+                self.target_speed = 0
         steer = 0
         if keys[pygame.K_LEFT]:
             steer -= 1

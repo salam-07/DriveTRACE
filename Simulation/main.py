@@ -5,8 +5,6 @@ from player import Player
 from traffic import TrafficManager
 import os
 
-ROAD__TILE = os.path.join(ROAD_ASSET_DIR, 'road_tile.jpeg')
-
 class Game:
     def __init__(self):
         pygame.init()
@@ -15,7 +13,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # Load and scale road tile
-        self.road_tile = pygame.image.load(ROAD__TILE)
+        self.road_tile = pygame.image.load(ROAD_ASSET_DIR)
         self.road_tile = pygame.transform.smoothscale(self.road_tile, 
                                               (ROAD_TILE_WIDTH, ROAD_TILE_HEIGHT))
         self.road_y_offset = 0

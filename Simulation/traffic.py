@@ -16,15 +16,10 @@ class TrafficVehicle:
         self.rect = self.image.get_rect()
         self.lane = lane
         self.world_y = world_y
-        self.speed = speed if speed is not None else random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+        self.speed = speed if speed is not None else random(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
         self.is_player_lane = False
 
     def update(self, player_speed, player_lane):
-        if self.lane == player_lane:
-            self.is_player_lane = True
-            self.speed += (player_speed - self.speed) * (1/FPS) # Smoothly adjust speed towards player speed
-        else:
-            self.is_player_lane = False
         self.world_y -= (player_speed - self.speed) * (1/FPS)
 
     def get_screen_pos(self, player_world_y, center_y):
@@ -51,11 +46,11 @@ class TrafficManager:
 
     def spawn_default_traffic(self):
         self.vehicles = []
-        min_gap = 80
+        min_gap = 5
         for lane in range(LANE_COUNT):
-            for i in range(20):
+            for i in range(TRAFFIC_DENSITY):
                 world_y = random.uniform(-2000, 4000)
-                speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+                speed = random.randint(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
                 self.vehicles.append(TrafficVehicle(lane, world_y, speed))
 
     def update(self, player_speed, player_lane, player_world_y):
