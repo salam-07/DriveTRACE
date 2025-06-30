@@ -20,7 +20,7 @@ MIN_SPEED = 0
 ACCELERATION_RATE = 70  # pixels per second squared
 TURNING_SPEED = 5  # degrees per frame
 TURNING_ANGLE = 7  # degrees per frame for player vehicle
-TRAFFIC_SPEED_RANGE = (170, 250)  # Min and max speed for traffic vehicles
+TRAFFIC_SPEED_RANGE = (200, 350)  # Min and max speed for traffic vehicles
 
 # Colors
 BLACK = (0, 0, 0)
