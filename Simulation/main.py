@@ -8,7 +8,7 @@ import os
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.NOFRAME)
         pygame.display.set_caption("DriveTRACE Simulation")
         self.clock = pygame.time.Clock()
 
@@ -24,8 +24,9 @@ class Game:
 
     def handle_input(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                    return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_t:
                     self.traffic_manager.toggle()

@@ -3,13 +3,13 @@ import os
 # Game configuration settings
 
 # Window settings
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 1040
+WINDOW_HEIGHT = 780
 FPS = 60
 
 # Road settings
-ROAD_TILE_WIDTH = 800  # Width of road tile
-ROAD_TILE_HEIGHT = 800  # Height of road tile
+ROAD_TILE_WIDTH = 1040  # Width of road tile
+ROAD_TILE_HEIGHT = 780  # Height of road tile
 LANE_COUNT = 4
 LANE_WIDTH = ROAD_TILE_WIDTH / LANE_COUNT
 
@@ -38,5 +38,5 @@ PLAYER_TILE_ASSET = os.path.join(ASSETS_DIR, 'vehicles', f'car_{PLAYER_CHOICE}.p
 TRAFFIC_ASSET_DIR = os.path.join(ASSETS_DIR, 'vehicles')
 
 # Traffic settings
-TRAFFIC_DENSITY = 40  # Number of vehicles per lane
+TRAFFIC_DENSITY = 20  # Number of vehicles per lane
 TRAFFIC_SPEED_RANGE = (250, 400)  # Min and max speed for traffic vehicles
