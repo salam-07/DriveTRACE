@@ -50,7 +50,7 @@ class TrafficManager:
         for lane in range(LANE_COUNT):
             for i in range(TRAFFIC_DENSITY):
                 world_y = random.uniform(-2000, 4000)
-                speed = random.randint(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+                speed = random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
                 self.vehicles.append(TrafficVehicle(lane, world_y, speed))
 
     def update(self, player_speed, player_lane, player_world_y):

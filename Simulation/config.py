@@ -1,6 +1,7 @@
 #for traffic speeds and behavior control
 import os
-# Game configuration settings
+import sys
+
 
 # Window settings
 WINDOW_WIDTH = 1040
