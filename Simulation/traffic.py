@@ -16,7 +16,7 @@ class TrafficVehicle:
         self.rect = self.image.get_rect()
         self.lane = lane
         self.world_y = world_y
-        self.speed = speed if speed is not None else random(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
+        self.speed = speed if speed is not None else random.uniform(TRAFFIC_SPEED_RANGE[0], TRAFFIC_SPEED_RANGE[1])
         self.is_player_lane = False
 
     def update(self, player_speed, player_lane):

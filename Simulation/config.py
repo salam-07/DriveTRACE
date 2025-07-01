@@ -30,8 +30,9 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 # Asset paths
-PLAYER_CHOICE = 7
+PLAYER_CHOICE = 9
 ROAD_CHOICE = 2
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(BASE_DIR, 'Assets')
 ROAD_ASSET_DIR = os.path.join(ASSETS_DIR, 'roads', f'road_tile_{ROAD_CHOICE}.jpeg')
