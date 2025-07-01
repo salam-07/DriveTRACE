@@ -35,6 +35,8 @@ class Player:
                 self.target_speed = (i / 9) * MAX_SPEED
             if keys[pygame.K_DOWN]:
                 self.target_speed = 0
+            if keys[pygame.K_x]:
+                self.target_speed = 500
         steer = 0
         if keys[pygame.K_LEFT]:
             steer -= 1
