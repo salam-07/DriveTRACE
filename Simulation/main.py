@@ -22,6 +22,11 @@ class Game:
         self.player = Player(WINDOW_WIDTH // 2, WINDOW_HEIGHT * 0.8)
         self.traffic_manager = TrafficManager()
 
+        # Traffic sound
+        from sounds import TrafficSound
+        self.traffic_sound = TrafficSound()
+        self.traffic_sound_playing = False
+
     def handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -38,6 +43,13 @@ class Game:
     def update(self):
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
+        # Play/stop traffic sound based on traffic enabled
+        if getattr(self.traffic_manager, 'enabled', False):
+            if not self.traffic_sound.is_playing():
+                self.traffic_sound.play()
+        else:
+            if self.traffic_sound.is_playing():
+                self.traffic_sound.stop()
         # Update road scroll position (now based on player world_y)
         self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 
