@@ -6,6 +6,7 @@ from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush
 from PyQt5.QtCore import Qt
 
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "Simulation/Assets/ui/bg1.jpg")
+LOGO_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo2.png")
 MAIN_PY_PATH = os.path.join(os.path.dirname(__file__), "Simulation/main.py")
 
 class MainWindow(QWidget):
@@ -115,11 +116,17 @@ class FadeSplashScreen(QSplashScreen):
 
     def drawContents(self, painter):
         painter.setOpacity(self._opacity)
-        # Title
-        painter.setFont(self.font())
-        painter.setPen(self.text_color)
-        painter.drawText(self.rect(), Qt.AlignCenter, "DriveTRACE")
-        # Developer
+        # Draw logo in the center
+        if os.path.exists(LOGO_PATH):
+            logo_pixmap = QPixmap(LOGO_PATH)
+            logo_ratio = 1069 / 214
+            logo_width = int(self.width() * 0.6)
+            logo_height = int(logo_width / logo_ratio)
+            logo_pixmap = logo_pixmap.scaled(logo_width, logo_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            x = (self.width() - logo_width) // 2
+            y = (self.height() - logo_height) // 2
+            painter.drawPixmap(x, y, logo_pixmap)
+        # Developer text at the bottom
         painter.setFont(self.dev_font)
         painter.setPen(self.dev_color)
         painter.drawText(0, self.height() - 80, self.width(), 40, Qt.AlignCenter, "Developed by: Abdus Salam")
