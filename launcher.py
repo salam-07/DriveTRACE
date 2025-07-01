@@ -89,8 +89,80 @@ class MainWindow(QWidget):
         subprocess.Popen([python_exe, MAIN_PY_PATH], shell=False)
     
 
+
+from PyQt5.QtCore import QTimer, QPropertyAnimation, pyqtProperty
+from PyQt5.QtWidgets import QSplashScreen
+from PyQt5.QtGui import QPainter, QColor, QFont
+
+class FadeSplashScreen(QSplashScreen):
+    def __init__(self, pixmap):
+        super().__init__(pixmap)
+        self._opacity = 0.0
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setFont(QFont('Segoe UI', 64, QFont.Bold))
+        self.dev_font = QFont('Segoe UI', 18, QFont.Normal)
+        self.text_color = QColor(255, 255, 255)
+        self.dev_color = QColor(255, 255, 255, 180)
+
+    def setOpacity(self, opacity):
+        self._opacity = opacity
+        self.repaint()
+
+    def getOpacity(self):
+        return self._opacity
+
+    opacity = pyqtProperty(float, fget=getOpacity, fset=setOpacity)
+
+    def drawContents(self, painter):
+        painter.setOpacity(self._opacity)
+        # Title
+        painter.setFont(self.font())
+        painter.setPen(self.text_color)
+        painter.drawText(self.rect(), Qt.AlignCenter, "DriveTRACE")
+        # Developer
+        painter.setFont(self.dev_font)
+        painter.setPen(self.dev_color)
+        painter.drawText(0, self.height() - 80, self.width(), 40, Qt.AlignCenter, "Developed by: Abdus Salam")
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawPixmap(0, 0, self.pixmap())
+        self.drawContents(painter)
+        painter.end()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    # Splash background: solid black
+    splash_width, splash_height = 1536, 1024
+    splash_pix = QPixmap(splash_width, splash_height)
+    splash_pix.fill(QColor(0, 0, 0))
+    splash = FadeSplashScreen(splash_pix)
+    splash.setFixedSize(splash_width, splash_height)
+    splash.show()
+
+    # Fade in
+    fade_in = QPropertyAnimation(splash, b"opacity")
+    fade_in.setDuration(800)
+    fade_in.setStartValue(0.0)
+    fade_in.setEndValue(1.0)
+
+    # Fade out
+    fade_out = QPropertyAnimation(splash, b"opacity")
+    fade_out.setDuration(800)
+    fade_out.setStartValue(1.0)
+    fade_out.setEndValue(0.0)
+
+    def show_launcher():
+        splash.finish(window)
+        window.show()
+
+    def start_fade_out():
+        fade_out.start()
+        fade_out.finished.connect(show_launcher)
+
+    # Launcher window
     window = MainWindow()
-    window.show()
+    # Sequence: fade in, wait, fade out
+    fade_in.start()
+    QTimer.singleShot(1400, start_fade_out)  # 0.8s fade in + 0.6s hold
     sys.exit(app.exec_())
