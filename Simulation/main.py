@@ -22,10 +22,15 @@ class Game:
         self.player = Player(WINDOW_WIDTH // 2, WINDOW_HEIGHT * 0.8)
         self.traffic_manager = TrafficManager()
 
-        # Traffic sound
-        from sounds import TrafficSound
+        # Traffic and ignition sounds
+        from sounds import TrafficSound, IgnitionSound, CarSound
         self.traffic_sound = TrafficSound()
         self.traffic_sound_playing = False
+        self.ignition_sound = IgnitionSound()
+        self.car_sound = CarSound()
+        self.ignition_sound.play(loops=0)
+        self.car_sound_timer = pygame.time.get_ticks() + 4000  # 4 seconds after ignition
+        self.car_sound_started = False
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -50,6 +55,11 @@ class Game:
         else:
             if self.traffic_sound.is_playing():
                 self.traffic_sound.stop()
+        # Start car sound 4 seconds after ignition
+        now = pygame.time.get_ticks()
+        if not self.car_sound_started and now >= self.car_sound_timer:
+            self.car_sound.play(loops=-1)
+            self.car_sound_started = True
         # Update road scroll position (now based on player world_y)
         self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 

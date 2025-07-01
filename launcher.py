@@ -1,3 +1,4 @@
+from Simulation.sounds import SplashScreenSound
 import sys
 import os
 from Simulation import *
@@ -139,6 +140,11 @@ class FadeSplashScreen(QSplashScreen):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # Play splash sound effect (ignition)
+    splash_sound = SplashScreenSound()
+    splash_sound.play(loops=0)
+
     # Splash background: solid black
     splash_width, splash_height = 1536, 1024
     splash_pix = QPixmap(splash_width, splash_height)
