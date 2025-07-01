@@ -3,12 +3,13 @@ import sys
 import os
 from Simulation import *
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
-from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush
+from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush, QIcon
 from PyQt5.QtCore import Qt
 
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "Simulation/Assets/ui/bg1.jpg")
 LOGO_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo2.png")
 MAIN_PY_PATH = os.path.join(os.path.dirname(__file__), "Simulation/main.py")
+ICON_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo3.png")
 
 class MainWindow(QWidget):
        
@@ -30,6 +31,7 @@ class MainWindow(QWidget):
         cp = screen.geometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+        self.setWindowIcon(QIcon(ICON_PATH))
 
         # Set background image
         if os.path.exists(BG_IMAGE_PATH):
@@ -104,6 +106,7 @@ class FadeSplashScreen(QSplashScreen):
         self.setFont(QFont('Segoe UI', 64, QFont.Bold))
         self.dev_font = QFont('Segoe UI', 18, QFont.Normal)
         self.text_color = QColor(255, 255, 255)
+        self.setWindowIcon(QIcon(ICON_PATH))
         self.dev_color = QColor(255, 255, 255, 180)
 
     def setOpacity(self, opacity):
@@ -140,6 +143,8 @@ class FadeSplashScreen(QSplashScreen):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    if os.path.exists(ICON_PATH):
+        app.setWindowIcon(QIcon(ICON_PATH))
 
     # Play splash sound effect (ignition)
     splash_sound = SplashScreenSound()

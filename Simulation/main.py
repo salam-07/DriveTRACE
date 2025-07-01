@@ -5,11 +5,16 @@ from player import Player
 from traffic import TrafficManager
 import os
 
+ICON_PATH = os.path.join(os.path.dirname(__file__), "Assets/ui/logo3.png")
+
 class Game:
     def __init__(self):
         pygame.init()
+        icon = pygame.image.load(ICON_PATH)
+        pygame.display.set_icon(icon)
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.NOFRAME)
         pygame.display.set_caption("DriveTRACE Simulation")
+
         self.clock = pygame.time.Clock()
 
         # Load and scale road tile
