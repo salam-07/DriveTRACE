@@ -30,7 +30,9 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 # Asset paths
-PLAYER_CHOICE = 9
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from launcher import car_choice
+PLAYER_CHOICE = car_choice
 ROAD_CHOICE = 2
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

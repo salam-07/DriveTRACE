@@ -11,3 +11,5 @@ Data/test_footage/raw (7).mp4
 *.pt
 Simulation/__pycache__/player.cpython-313.pyc
 /__pycache__/
+__pycache__/launcher.cpython-313.pyc
+Simulation/__pycache__/config.cpython-313.pyc
