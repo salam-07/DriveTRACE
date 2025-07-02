@@ -1,31 +1,38 @@
-from Simulation.sounds import SplashScreenSound
 import sys
 import os
-from Simulation import *
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
-from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush, QIcon
-from PyQt5.QtCore import Qt
+
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QSplashScreen
+from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush, QIcon, QPainter, QColor, QFont
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, pyqtProperty
+
+from Simulation.sounds import SplashScreenSound
+from Simulation import config
+
 
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "Simulation/Assets/ui/bg1.jpg")
 LOGO_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo2.png")
 MAIN_PY_PATH = os.path.join(os.path.dirname(__file__), "Simulation/main.py")
 ICON_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo3.png")
 
-class MainWindow(QWidget):
-       
+
+
+class MainWindow(QWidget):  
     def __init__(self):
+
         super().__init__()
+
         # Get screen size
         screen = QApplication.primaryScreen()
         screen_size = screen.size()
         screen_width = screen_size.width()
         screen_height = screen_size.height()
-        # Maintain aspect ratio (1248:936)
+
         aspect_ratio = 1536 / 1024
         window_height = int(screen_height * 0.95)
         window_width = int(window_height * aspect_ratio)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setFixedSize(window_width, window_height)
+        
         # Center the window on the screen
         qr = self.frameGeometry()
         cp = screen.geometry().center()
@@ -44,7 +51,7 @@ class MainWindow(QWidget):
         self.placeholder_label.setStyleSheet("color: rgba(255, 255, 255, 0.5); font-size: 20px; font-family: Arial, sans-serif; font-weight: 200;")
         self.placeholder_label.setAlignment(Qt.AlignCenter)
         self.placeholder_label.setFixedWidth(window_width)
-        self.placeholder_label.move(0, window_height - 80)
+        self.placeholder_label.move(0, window_height - int(0.1 * window_height))
 
         self.launch_btn = QPushButton("Launch Simulation", self)
         self.launch_btn.setGeometry(int((window_width-600)/2), 190, 600, 110)
@@ -94,10 +101,6 @@ class MainWindow(QWidget):
     
 
 
-from PyQt5.QtCore import QTimer, QPropertyAnimation, pyqtProperty
-from PyQt5.QtWidgets import QSplashScreen
-from PyQt5.QtGui import QPainter, QColor, QFont
-
 class FadeSplashScreen(QSplashScreen):
     def __init__(self, pixmap):
         super().__init__(pixmap)
@@ -146,12 +149,17 @@ if __name__ == "__main__":
     if os.path.exists(ICON_PATH):
         app.setWindowIcon(QIcon(ICON_PATH))
 
-    # Play splash sound effect (ignition)
+    # Play splash sound effect
     splash_sound = SplashScreenSound()
     splash_sound.play(loops=0)
 
     # Splash background: solid black
-    splash_width, splash_height = 1536, 1024
+    screen_width = QApplication.primaryScreen().size().width()
+    screen_height = QApplication.primaryScreen().size().height()
+    aspect_ratio = 1536 / 1024
+    splash_height = int(screen_height * 0.95)
+    splash_width = int(splash_height * aspect_ratio)
+
     splash_pix = QPixmap(splash_width, splash_height)
     splash_pix.fill(QColor(0, 0, 0))
     splash = FadeSplashScreen(splash_pix)
