@@ -1,16 +1,15 @@
 from Simulation.sounds import SplashScreenSound
 import sys
 import os
+from Simulation import *
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
 from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush, QIcon
-from PyQt5.QtCore import Qt 
+from PyQt5.QtCore import Qt
 
 BG_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "Simulation/Assets/ui/bg1.jpg")
 LOGO_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo2.png")
 MAIN_PY_PATH = os.path.join(os.path.dirname(__file__), "Simulation/main.py")
 ICON_PATH = os.path.join(os.path.dirname(__file__), "Docs/Images/logo3.png")
-
-car_choice = 17
 
 class MainWindow(QWidget):
        
@@ -41,15 +40,11 @@ class MainWindow(QWidget):
             palette.setBrush(QPalette.Window, QBrush(pixmap))
             self.setPalette(palette)
 
-        
-
         self.placeholder_label = QLabel("© 2025 DriveTRACE. Developed by: Abdus Salam", self)
         self.placeholder_label.setStyleSheet("color: rgba(255, 255, 255, 0.5); font-size: 20px; font-family: Arial, sans-serif; font-weight: 200;")
         self.placeholder_label.setAlignment(Qt.AlignCenter)
         self.placeholder_label.setFixedWidth(window_width)
         self.placeholder_label.move(0, window_height - 80)
-
-        
 
         self.launch_btn = QPushButton("Launch Simulation", self)
         self.launch_btn.setGeometry(int((window_width-600)/2), 190, 600, 110)
@@ -88,10 +83,7 @@ class MainWindow(QWidget):
                 background: rgba(200,0,0,0.8);
             }
         """)
-
         self.quit_btn.clicked.connect(self.close)
-
-    
 
 
     def launch_simulation(self):
