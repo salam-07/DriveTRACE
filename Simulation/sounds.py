@@ -46,6 +46,7 @@ class CarSound:
     def __init__(self):
         pygame.mixer.init()
         self.sound = pygame.mixer.Sound(CAR_SOUND)
+        self.sound.set_volume(3)
         self.channel = None
 
     def play(self, loops=-1):

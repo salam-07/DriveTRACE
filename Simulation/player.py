@@ -1,5 +1,8 @@
+#import libraries
 import pygame
 import math
+
+#import config
 from config import *
 
 class Player:
@@ -26,16 +29,36 @@ class Player:
     def handle_input(self, keys):
         # Speed control with number keys
         for i in range(10):
-            #see which numeric key is being pressed
+            # see which numeric key is being pressed
             if keys[getattr(pygame, f'K_{i}')]:
-                #linear division of speed from 0 to 9
+                # linear division of speed from 0 to 9
                 self.target_speed = (i / 9) * MAX_SPEED
-                
-            #implement sudden braking
-            if keys[pygame.K_DOWN]:
-                self.target_speed = 0
-            if keys[pygame.K_x]:
-                self.target_speed = 500
+
+        # Sudden braking system with acceleration factor
+        BRAKE_ACCEL = ACCELERATION_RATE * 4  # Braking is 4x faster than normal acceleration
+        if keys[pygame.K_DOWN]:
+            if not hasattr(self, 'braking') or not self.braking:
+                self.braking = True
+                self.prev_target_speed = self.target_speed
+                self.brake_released = False
+            # Apply strong negative acceleration until speed is zero
+            if self.speed > 0:
+                self.acceleration = -BRAKE_ACCEL
+                self.speed += self.acceleration * (1/FPS)
+                if self.speed < 0:
+                    self.speed = 0
+            self.target_speed = 0
+        else:
+            if hasattr(self, 'braking') and self.braking and not self.brake_released:
+                # Key released after braking, resume previous speed
+                self.target_speed = getattr(self, 'prev_target_speed', 0)
+                self.braking = False
+                self.brake_released = True
+
+        # Easter egg: turbo mode
+        if keys[pygame.K_x]:
+            self.target_speed = MAX_SPEED * 3
+
         steer = 0
         if keys[pygame.K_LEFT]:
             steer -= 1

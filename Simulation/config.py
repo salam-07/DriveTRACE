@@ -20,7 +20,7 @@ MAX_SPEED = 370  # pixels per second
 MIN_SPEED = 0
 ACCELERATION_RATE = 70  # pixels per second squared
 TURNING_SPEED = 5  # degrees per frame
-TURNING_ANGLE = 7  # degrees per frame for player vehicle
+TURNING_ANGLE = 3  # degrees per frame for player vehicle
 
 # Colors
 BLACK = (0, 0, 0)
