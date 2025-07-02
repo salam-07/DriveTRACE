@@ -54,25 +54,31 @@ class Game:
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
         # Play/stop traffic sound based on traffic enabled
-        if getattr(self.traffic_manager, 'enabled', False):
+        if getattr(self.traffic_manager, 'enabled', False): #checks the enabled attribute of traffic. Default returns False
             if not self.traffic_sound.is_playing():
+                #if traffic traffic is enabled and sound is not playing, play it
                 self.traffic_sound.play()
         else:
+            #if traffic is disabled and sound is playing, stop it
             if self.traffic_sound.is_playing():
                 self.traffic_sound.stop()
+
+        #car driving sound
         # Start car sound 4 seconds after ignition
         now = pygame.time.get_ticks()
+        #if not already playing and after the set 4 second timer.
         if not self.car_sound_started and now >= self.car_sound_timer:
-            self.car_sound.play(loops=-1)
+            self.car_sound.play(loops=-1) #loop infinite times
             self.car_sound_started = True
+
         # Update road scroll position (now based on player world_y)
         self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 
     def draw(self):
         self.screen.fill(BLACK)
         center_y = int(WINDOW_HEIGHT * 0.8)
-        # Draw road tiles with scrolling, centered on player
-        for y in range(-3, 3):
+        # Draw road tiles and scroll them
+        for y in range(-3, 3): 
             tile_y = y * ROAD_TILE_HEIGHT + center_y + self.road_y_offset
             self.screen.blit(self.road_tile, (0, tile_y))
         self.traffic_manager.draw(self.screen, self.player.world_y, center_y)

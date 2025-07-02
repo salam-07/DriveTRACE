@@ -31,7 +31,7 @@ BLUE = (0, 0, 255)
 
 # Asset paths
 PLAYER_CHOICE = 9
-ROAD_CHOICE = 2
+ROAD_CHOICE = 3
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(BASE_DIR, 'Assets')

@@ -4,21 +4,16 @@ from config import *
 
 class Player:
     def __init__(self, x, y):
+        #load the car asset and scale to choice
         car_img = pygame.image.load(PLAYER_TILE_ASSET).convert_alpha()
         new_width = int(LANE_WIDTH * VEHICLE_SCALE)
         new_height = int((new_width / car_img.get_width()) * car_img.get_height())
         car_img = pygame.transform.smoothscale(car_img, (new_width, new_height))
-        # Create shadow
-        shadow_offset = 10
-        shadow_alpha = 100
-        shadow_img = pygame.Surface((new_width + shadow_offset*2, new_height + shadow_offset*2), pygame.SRCALPHA)
-        shadow = pygame.Surface((new_width, new_height), pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow, (0,0,0,shadow_alpha), shadow.get_rect())
-        shadow_img.blit(shadow, (shadow_offset, new_height + shadow_offset//2))
-        shadow_img.blit(car_img, (shadow_offset, shadow_offset))
-        self.original_image = shadow_img
+
+        self.original_image = car_img
         self.image = self.original_image
         self.rect = self.image.get_rect()
+
         self.x = (LANE_COUNT // 2 + 0.5) * LANE_WIDTH
         self.y = 0  # world y
         self.angle = 0  # visual angle
@@ -31,8 +26,12 @@ class Player:
     def handle_input(self, keys):
         # Speed control with number keys
         for i in range(10):
+            #see which numeric key is being pressed
             if keys[getattr(pygame, f'K_{i}')]:
+                #linear division of speed from 0 to 9
                 self.target_speed = (i / 9) * MAX_SPEED
+                
+            #implement sudden braking
             if keys[pygame.K_DOWN]:
                 self.target_speed = 0
             if keys[pygame.K_x]:
