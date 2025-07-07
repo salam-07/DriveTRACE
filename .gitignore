@@ -10,3 +10,7 @@ Data/test_footage/raw (7).mp4
 *.mp4
 *.pt
 *.pyc
+Simulation/__pycache__/config.cpython-313.pyc
+Simulation/__pycache__/traffic.cpython-313.pyc
+Simulation/__pycache__/sounds.cpython-313.pyc
+Simulation/__pycache__/player.cpython-313.pyc
