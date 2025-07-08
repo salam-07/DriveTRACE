@@ -5,7 +5,7 @@ import random
 from config import *
 
 class CSVTrafficVehicle:
-    def __init__(self, vehicle_id, lane, world_y, speed, action="maintain"):
+    def __init__(self, vehicle_id, world_x, world_y, speed, action="maintain"):
         # Load random vehicle image
         vehicle_files = [f for f in os.listdir(TRAFFIC_ASSET_DIR) 
                         if f.startswith('car_')]
@@ -21,13 +21,12 @@ class CSVTrafficVehicle:
         
         # Vehicle properties
         self.vehicle_id = vehicle_id
-        self.lane = lane
+        self.world_x = world_x  # X position in world coordinates
         self.world_y = world_y
         self.speed = speed
         self.action = action
-        self.target_lane = lane
-        self.lane_change_progress = 0
-        self.lane_change_speed = 0.05  # How fast lane changes occur
+        self.target_x = world_x  # Target X position for gradual lane changes
+        self.lane_change_speed = 2.0  # Speed of lane changes in pixels per frame
         
         # For smooth interpolation between CSV data points
         self.target_speed = speed
@@ -37,20 +36,12 @@ class CSVTrafficVehicle:
         # Smooth interpolation to target speed
         self.speed += (self.target_speed - self.speed) * 0.02
         
-        # Handle lane changes
-        if self.target_lane != self.lane:
-            self.lane_change_progress += self.lane_change_speed
-            if self.lane_change_progress >= 1.0:
-                self.lane = self.target_lane
-                self.lane_change_progress = 0
-        
-        # Calculate current lane position (for smooth lane changes)
-        if self.lane_change_progress > 0:
-            current_lane_float = self.lane + (self.target_lane - self.lane) * self.lane_change_progress
+        # Gradual movement towards target X position
+        if abs(self.target_x - self.world_x) > 1:
+            direction = 1 if self.target_x > self.world_x else -1
+            self.world_x += direction * self.lane_change_speed
         else:
-            current_lane_float = float(self.lane)
-        
-        self.current_lane_float = current_lane_float
+            self.world_x = self.target_x
         
         # Move relative to player with natural vehicle movement
         speed_difference = player_speed - self.speed
@@ -60,8 +51,8 @@ class CSVTrafficVehicle:
         return int(center_y - (self.world_y - player_world_y))
     
     def draw(self, screen, player_world_y, center_y):
-        # Use current_lane_float for smooth lane changes
-        base_x = int((self.current_lane_float + 0.5) * LANE_WIDTH)
+        # Use world_x directly for positioning
+        base_x = int(self.world_x)
         base_y = self.get_screen_pos(player_world_y, center_y)
         
         self.rect.centerx = base_x
@@ -69,7 +60,7 @@ class CSVTrafficVehicle:
         screen.blit(self.image, self.rect)
 
 class CSVTrafficManager:
-    def __init__(self, csv_file_path="TrafficData/traffic_data_2.csv"):
+    def __init__(self, csv_file_path="TrafficData/traffic_data_3.csv"):
         self.csv_file_path = os.path.join(os.path.dirname(__file__), csv_file_path)
         self.vehicles = {}
         self.enabled = False
@@ -113,10 +104,20 @@ class CSVTrafficManager:
             # Create vehicles with spread out positions around the player
             random_offset = random.uniform(-800, 1500)  # Spread vehicles around player
             
+            # Handle both new world_x format and old lane format
+            if 'world_x' in row:
+                world_x = row['world_x']
+                world_y = row.get('world_y', random_offset)
+            else:
+                # Convert lane to world_x coordinate
+                lane = row['lane']
+                world_x = (lane * LANE_WIDTH) + (LANE_WIDTH / 2)
+                world_y = row.get('world_y', random_offset)
+            
             self.vehicles[vehicle_id] = CSVTrafficVehicle(
                 vehicle_id=vehicle_id,
-                lane=row['lane'],
-                world_y=random_offset,  # Position relative to start
+                world_x=world_x,
+                world_y=world_y,
                 speed=row['speed'],
                 action=row['action']
             )
@@ -137,18 +138,23 @@ class CSVTrafficManager:
         current_frame_int = int(self.current_frame)
         frame_data = self.df[self.df['frame_id'] == current_frame_int]
         
-        # Update each vehicle with CSV data, but only speed and lane changes
+        # Update each vehicle with CSV data
         for _, row in frame_data.iterrows():
             vehicle_id = row['vehicle_id']
             if vehicle_id in self.vehicles:
-                # Only update speed and lane, not position
+                # Update speed
                 self.vehicles[vehicle_id].target_speed = row['speed']
                 self.vehicles[vehicle_id].action = row['action']
                 
-                # Handle lane changes
-                if row['lane'] != self.vehicles[vehicle_id].lane:
-                    self.vehicles[vehicle_id].target_lane = row['lane']
-                    self.vehicles[vehicle_id].lane_change_progress = 0
+                # Handle both new world_x format and old lane format
+                if 'world_x' in row:
+                    # Use direct x coordinate
+                    self.vehicles[vehicle_id].target_x = row['world_x']
+                else:
+                    # Convert lane to world_x coordinate
+                    lane = row['lane']
+                    target_x = (lane * LANE_WIDTH) + (LANE_WIDTH / 2)
+                    self.vehicles[vehicle_id].target_x = target_x
         
         # Update vehicle physics
         dt = 1/FPS
