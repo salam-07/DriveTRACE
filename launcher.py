@@ -1,13 +1,40 @@
 import sys
 import os
+import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QSplashScreen
 from PyQt5.QtGui import QPixmap, QFont, QPalette, QBrush, QIcon, QPainter, QColor, QFont
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, pyqtProperty
 from Simulation.sounds import SplashScreenSound
 from Simulation import config
-from Simulation.utils import (
-    get_abs_path, set_window_icon, set_app_icon, set_background_image, launch_simulation
-)
+
+# Inline utility functions
+def get_abs_path(relative_path):
+    """Get absolute path from relative path"""
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path))
+
+def set_window_icon(window, icon_path):
+    """Set window icon"""
+    if os.path.exists(icon_path):
+        icon = QIcon(icon_path)
+        window.setWindowIcon(icon)
+
+def set_app_icon(app, icon_path):
+    """Set application icon"""
+    if os.path.exists(icon_path):
+        icon = QIcon(icon_path)
+        app.setWindowIcon(icon)
+
+def set_background_image(window, bg_path):
+    """Set background image for window"""
+    if os.path.exists(bg_path):
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(bg_path).scaled(window.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)))
+        window.setPalette(palette)
+
+def launch_simulation(main_py_path):
+    """Launch the simulation"""
+    if os.path.exists(main_py_path):
+        subprocess.Popen([sys.executable, main_py_path])
 
 BG_IMAGE_PATH = get_abs_path("Simulation/Assets/ui/bg1.jpg")
 LOGO_PATH = get_abs_path("Docs/Images/logo2.png")
