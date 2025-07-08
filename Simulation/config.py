@@ -1,7 +1,5 @@
 #for traffic speeds and behavior control
 import os
-import sys
-
 
 # Window settings
 WINDOW_WIDTH = 1040
@@ -25,9 +23,6 @@ TURNING_ANGLE = 3  # degrees per frame for player vehicle
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
 
 # Asset paths
 PLAYER_CHOICE = 9
@@ -38,7 +33,3 @@ ASSETS_DIR = os.path.join(BASE_DIR, 'Assets')
 ROAD_ASSET_DIR = os.path.join(ASSETS_DIR, 'roads', f'road_tile_{ROAD_CHOICE}.jpeg')
 PLAYER_TILE_ASSET = os.path.join(ASSETS_DIR, 'vehicles', f'car_{PLAYER_CHOICE}.png')
 TRAFFIC_ASSET_DIR = os.path.join(ASSETS_DIR, 'vehicles')
-
-# Traffic settings
-TRAFFIC_DENSITY = 20  # Number of vehicles per lane
-TRAFFIC_SPEED_RANGE = (350, 500)  # Min and max speed for traffic vehicles

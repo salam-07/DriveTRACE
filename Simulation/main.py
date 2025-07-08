@@ -30,7 +30,6 @@ class Game:
         # Traffic and ignition sounds
         from sounds import TrafficSound, IgnitionSound, CarSound
         self.traffic_sound = TrafficSound()
-        self.traffic_sound_playing = False
         self.ignition_sound = IgnitionSound()
         self.car_sound = CarSound()
         self.ignition_sound.play(loops=0)
@@ -85,11 +84,11 @@ class Game:
         self.player.draw(self.screen, int(self.player.x), center_y)
         
         # Draw debug info
-        if hasattr(self.traffic_manager, 'get_debug_info'):
-            debug_text = self.traffic_manager.get_debug_info()
-            font = pygame.font.Font(None, 36)
-            text_surface = font.render(debug_text, True, WHITE)
-            self.screen.blit(text_surface, (10, 10))
+        # if hasattr(self.traffic_manager, 'get_debug_info'):
+        #     debug_text = self.traffic_manager.get_debug_info()
+        #     font = pygame.font.Font(None, 36)
+        #     text_surface = font.render(debug_text, True, WHITE)
+        #     self.screen.blit(text_surface, (10, 10))
         
         pygame.display.flip()
 

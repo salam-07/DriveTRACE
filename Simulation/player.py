@@ -24,7 +24,6 @@ class Player:
         self.speed = 0
         self.target_speed = 0
         self.acceleration = 0
-        self.last_keys = None
 
     def handle_input(self, keys):
         # Speed control with number keys

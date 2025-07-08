@@ -31,20 +31,7 @@ class CSVTrafficVehicle:
         
         # For smooth interpolation between CSV data points
         self.target_speed = speed
-        self.target_lane_float = float(lane)
         
-    def update_from_csv_data(self, lane, world_y, speed, action):
-        """Update vehicle state from CSV data"""
-        self.target_lane_float = float(lane)
-        self.target_world_y = world_y
-        self.target_speed = speed
-        self.action = action
-        
-        # Handle lane changes
-        if lane != self.lane:
-            self.target_lane = lane
-            self.lane_change_progress = 0
-    
     def update(self, player_speed, player_lane, dt):
         """Update vehicle position and state"""
         # Smooth interpolation to target speed
@@ -82,7 +69,7 @@ class CSVTrafficVehicle:
         screen.blit(self.image, self.rect)
 
 class CSVTrafficManager:
-    def __init__(self, csv_file_path="traffic_data.csv"):
+    def __init__(self, csv_file_path="TrafficData/traffic_data_1.csv"):
         self.csv_file_path = os.path.join(os.path.dirname(__file__), csv_file_path)
         self.vehicles = {}
         self.enabled = False
@@ -90,10 +77,6 @@ class CSVTrafficManager:
         self.max_frame = 0
         self.df = None
         self.load_csv_data()
-        
-        # For looping behavior
-        self.loop_offset_y = 0
-        self.section_length = 8000  # Length of the road section in world units
         
     def load_csv_data(self):
         """Load traffic data from CSV file"""
@@ -191,10 +174,6 @@ class CSVTrafficManager:
             screen_y = vehicle.get_screen_pos(player_world_y, center_y)
             if -100 < screen_y < WINDOW_HEIGHT + 100:
                 vehicle.draw(screen, player_world_y, center_y)
-    
-    def get_vehicle_count(self):
-        """Get current number of active vehicles"""
-        return len(self.vehicles) if self.enabled else 0
     
     def get_debug_info(self):
         """Get debug information about the traffic system"""
