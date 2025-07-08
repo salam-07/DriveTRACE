@@ -2,7 +2,7 @@ import pygame
 import sys
 from config import *
 from player import Player
-from traffic import TrafficManager
+from csv_traffic import CSVTrafficManager
 import os
 
 ICON_PATH = os.path.join(os.path.dirname(__file__), "Assets/ui/logo3.png")
@@ -25,7 +25,7 @@ class Game:
 
         # Create player and traffic
         self.player = Player(WINDOW_WIDTH // 2, WINDOW_HEIGHT * 0.8)
-        self.traffic_manager = TrafficManager()
+        self.traffic_manager = CSVTrafficManager()
 
         # Traffic and ignition sounds
         from sounds import TrafficSound, IgnitionSound, CarSound
@@ -83,6 +83,14 @@ class Game:
             self.screen.blit(self.road_tile, (0, tile_y))
         self.traffic_manager.draw(self.screen, self.player.world_y, center_y)
         self.player.draw(self.screen, int(self.player.x), center_y)
+        
+        # Draw debug info
+        if hasattr(self.traffic_manager, 'get_debug_info'):
+            debug_text = self.traffic_manager.get_debug_info()
+            font = pygame.font.Font(None, 36)
+            text_surface = font.render(debug_text, True, WHITE)
+            self.screen.blit(text_surface, (10, 10))
+        
         pygame.display.flip()
 
     def run(self):
