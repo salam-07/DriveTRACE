@@ -60,48 +60,25 @@ class CSVTrafficVehicle:
         screen.blit(self.image, self.rect)
 
 class CSVTrafficManager:
-    def __init__(self, csv_file_path="TrafficData/traffic_data_4.csv"):
+    def __init__(self, csv_file_path="TrafficData/traffic_data_3.csv"):
         self.csv_file_path = os.path.join(os.path.dirname(__file__), csv_file_path)
         self.vehicles = {}
         self.enabled = False
         self.current_frame = 0
         self.max_frame = 0
         self.df = None
-        self.scale_factor = 1.0  # Scale factor for converting detection coordinates
         self.load_csv_data()
         
     def load_csv_data(self):
         """Load traffic data from CSV file"""
         try:
             self.df = pd.read_csv(self.csv_file_path)
-            
-            # Rename columns to match our needs
-            self.df = self.df.rename(columns={
-                'frame': 'frame_id',
-                'x_position': 'world_x',
-                'y_position': 'world_y',
-                'speed_px_per_s': 'speed'
-            })
-            
-            # Calculate scale factor based on the data range
-            x_range = self.df['world_x'].max() - self.df['world_x'].min()
-            self.scale_factor = (WINDOW_WIDTH * 0.8) / x_range  # Use 80% of window width
-            
-            # Scale coordinates to match game window
-            self.df['world_x'] = self.df['world_x'] * self.scale_factor
-            self.df['world_y'] = self.df['world_y'] * self.scale_factor
-            self.df['speed'] = self.df['speed'] * self.scale_factor / FPS  # Convert to pixels per frame
-            
-            # Add action column if not present
-            if 'action' not in self.df.columns:
-                self.df['action'] = 'maintain'
-            
             self.max_frame = self.df['frame_id'].max()
             print(f"Loaded traffic data: {len(self.df)} entries, max frame: {self.max_frame}")
             
             # Get unique vehicle IDs
             self.vehicle_ids = self.df['vehicle_id'].unique()
-            print(f"Found {len(self.vehicle_ids)} vehicles in recording")
+            print(f"Vehicle IDs: {self.vehicle_ids}")
             
         except FileNotFoundError:
             print(f"CSV file not found: {self.csv_file_path}")
@@ -120,23 +97,29 @@ class CSVTrafficManager:
         """Initialize vehicles from CSV data"""
         self.vehicles = {}
         # Get initial frame data (frame 0)
-        initial_frame = self.df[self.df['frame_id'] == self.df['frame_id'].min()]
+        initial_frame = self.df[self.df['frame_id'] == 0]
         
         for _, row in initial_frame.iterrows():
             vehicle_id = row['vehicle_id']
+            # Create vehicles with spread out positions around the player
+            random_offset = random.uniform(-800, 1500)  # Spread vehicles around player
             
-            # Center the x coordinates in the window
-            world_x = row['world_x'] + (WINDOW_WIDTH / 2 - (WINDOW_WIDTH * 0.8) / 2)
-            
-            # Initialize with actual y position from data
-            world_y = row['world_y']
+            # Handle both new world_x format and old lane format
+            if 'world_x' in row:
+                world_x = row['world_x']
+                world_y = row.get('world_y', random_offset)
+            else:
+                # Convert lane to world_x coordinate
+                lane = row['lane']
+                world_x = (lane * LANE_WIDTH) + (LANE_WIDTH / 2)
+                world_y = row.get('world_y', random_offset)
             
             self.vehicles[vehicle_id] = CSVTrafficVehicle(
                 vehicle_id=vehicle_id,
                 world_x=world_x,
                 world_y=world_y,
                 speed=row['speed'],
-                action=row.get('action', 'maintain')
+                action=row['action']
             )
     
     def update(self, player_speed, player_lane, player_world_y):
@@ -159,14 +142,19 @@ class CSVTrafficManager:
         for _, row in frame_data.iterrows():
             vehicle_id = row['vehicle_id']
             if vehicle_id in self.vehicles:
-                # Center the x coordinates in the window
-                world_x = row['world_x'] + (WINDOW_WIDTH / 2 - (WINDOW_WIDTH * 0.8) / 2)
-                
-                # Update vehicle properties
+                # Update speed
                 self.vehicles[vehicle_id].target_speed = row['speed']
-                self.vehicles[vehicle_id].target_x = world_x
-                self.vehicles[vehicle_id].world_y = row['world_y']
-                self.vehicles[vehicle_id].action = row.get('action', 'maintain')
+                self.vehicles[vehicle_id].action = row['action']
+                
+                # Handle both new world_x format and old lane format
+                if 'world_x' in row:
+                    # Use direct x coordinate
+                    self.vehicles[vehicle_id].target_x = row['world_x']
+                else:
+                    # Convert lane to world_x coordinate
+                    lane = row['lane']
+                    target_x = (lane * LANE_WIDTH) + (LANE_WIDTH / 2)
+                    self.vehicles[vehicle_id].target_x = target_x
         
         # Update vehicle physics
         dt = 1/FPS

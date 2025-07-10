@@ -5,6 +5,9 @@ from player import Player
 from csv_traffic import CSVTrafficManager
 import os
 
+# Import FeedbackHUD
+from feedback import FeedbackHUD
+
 ICON_PATH = os.path.join(os.path.dirname(__file__), "Assets/ui/logo3.png")
 
 class Game:
@@ -26,6 +29,9 @@ class Game:
         # Create player and traffic
         self.player = Player(WINDOW_WIDTH // 2, WINDOW_HEIGHT * 0.8)
         self.traffic_manager = CSVTrafficManager()
+
+        # Feedback HUD
+        self.feedback_hud = FeedbackHUD()
 
         # Traffic and ignition sounds
         from sounds import TrafficSound, IgnitionSound, CarSound
@@ -52,6 +58,8 @@ class Game:
     def update(self):
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
+        # Update feedback HUD with current speed
+        self.feedback_hud.update(self.player.speed)
         # Play/stop traffic sound based on traffic enabled
         if getattr(self.traffic_manager, 'enabled', False): #checks the enabled attribute of traffic. Default returns False
             if not self.traffic_sound.is_playing():
@@ -82,6 +90,8 @@ class Game:
             self.screen.blit(self.road_tile, (0, tile_y))
         self.traffic_manager.draw(self.screen, self.player.world_y, center_y)
         self.player.draw(self.screen, int(self.player.x), center_y)
+        # Draw feedback HUD
+        self.feedback_hud.draw(self.screen)
         
         # Draw debug info
         # if hasattr(self.traffic_manager, 'get_debug_info'):
