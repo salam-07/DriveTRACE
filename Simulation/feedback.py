@@ -17,8 +17,9 @@ import time
 
 SWERVE_TIME_THRESHOLD = 1.0  # seconds
 SWERVE_MOVEMENT_THRESHOLD = 1  # minimum movement per frame to count as swerving
-PROXIMITY_WARNING_DISTANCE = 150  # distance in pixels to trigger proximity warning
-TRAFFIC_NOTIFICATION_DURATION = 2.0  # seconds to show traffic notification
+PROXIMITY_WARNING_DISTANCE = 250  # distance in pixels to trigger proximity warning
+COLLISION_DISTANCE = 100  # distance in pixels to trigger collision warning
+TRAFFIC_NOTIFICATION_DURATION = 3.0  # seconds to show traffic notification
 
 
 class FeedbackHUD:
@@ -38,6 +39,7 @@ class FeedbackHUD:
         self.overspeed_warning = None
         self.swerve_warning = None
         self.proximity_warning = None
+        self.collision_warning = None
         self.traffic_notification = None
         self.warning_timer = 0
         self._last_x = None
@@ -117,6 +119,7 @@ class FeedbackHUD:
         self.overspeed_warning = None
         self.swerve_warning = None
         self.proximity_warning = None
+        self.collision_warning = None
         
         now = time.time()
         
@@ -150,7 +153,7 @@ class FeedbackHUD:
         if player_x is not None:
             self._last_x = player_x
         
-        # Proximity detection to traffic vehicles
+        # Proximity and collision detection to traffic vehicles
         if player_x is not None and player_y is not None and traffic_vehicles:
             for vehicle in traffic_vehicles:
                 # Calculate distance between player and traffic vehicle
@@ -158,9 +161,12 @@ class FeedbackHUD:
                 dy = player_y - vehicle.world_y
                 distance = (dx**2 + dy**2)**0.5
                 
-                if distance < PROXIMITY_WARNING_DISTANCE:
+                if distance < COLLISION_DISTANCE:
+                    self.collision_warning = "COLLISION! Vehicle contact detected!"
+                    break  # Collision takes priority over proximity
+                elif distance < PROXIMITY_WARNING_DISTANCE:
                     self.proximity_warning = "Too close to traffic! Maintain safe distance."
-                    break  # Only need to warn once
+                    # Don't break here in case there's a closer collision
         
         if speed < STOPPED_SPEED_THRESHOLD:
             self.high_warning = "Stopped: Safely pull over to the left if you want to stop."
@@ -176,12 +182,16 @@ class FeedbackHUD:
         if self.traffic_notification:
             y += self._draw_hud_warning(surface, self.traffic_notification, INFO_COLOR, y)
         
+        # Critical warnings first (red - highest priority)
+        if self.collision_warning:
+            y += self._draw_hud_warning(surface, self.collision_warning, HIGH_WARNING_COLOR, y)
+        
         # High priority warnings (red)
         if self.high_warning:
             y += self._draw_hud_warning(surface, self.high_warning, HIGH_WARNING_COLOR, y)
         
         if self.proximity_warning:
-            y += self._draw_hud_warning(surface, self.proximity_warning, HIGH_WARNING_COLOR, y)
+            y += self._draw_hud_warning(surface, self.proximity_warning, MILD_WARNING_COLOR, y)
         
         if self.swerve_warning:
             y += self._draw_hud_warning(surface, self.swerve_warning, HIGH_WARNING_COLOR, y)
