@@ -58,8 +58,8 @@ class Game:
     def update(self):
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
-        # Update feedback HUD with current speed
-        self.feedback_hud.update(self.player.speed)
+        # Update feedback HUD with current speed and x position
+        self.feedback_hud.update(self.player.speed, player_x=self.player.x)
         # Play/stop traffic sound based on traffic enabled
         if getattr(self.traffic_manager, 'enabled', False): #checks the enabled attribute of traffic. Default returns False
             if not self.traffic_sound.is_playing():
