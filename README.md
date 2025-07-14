@@ -4,7 +4,7 @@
 A real-world traffic simulation to replicate traffic flow from actual routes, providing a learning environment and constant feedback.
 
 ![screenshot](Docs/Images/Cover%20Image%20copy.jpg)
-<br>
+<br> 
 
 # Overview
 **DriveTRACE** is a real world traffic simulation system designed to help beginner drivers safely practice driving in a realistic, natural traffic flow. The system uses computer vision techniques to classify, detect, and trace vehicle paths from highway footage over a period of time. These vehicle patterns are replicated in a simulation environment, complete with real-time feedback on driving behaviour of the user.
