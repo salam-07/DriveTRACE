@@ -11,39 +11,120 @@ OVERSPEED_THRESHOLD = 250   # km/h or game units per second (set as needed)
 MILD_WARNING_COLOR = (255, 215, 0)   # Gold
 HIGH_WARNING_COLOR = (255, 0, 0)     # Red
 OVERSPEED_COLOR = (255, 69, 0)       # OrangeRed
+INFO_COLOR = (0, 150, 255)           # Blue for informational messages
 
 import time
 
 SWERVE_TIME_THRESHOLD = 1.0  # seconds
-SWERVE_MOVEMENT_THRESHOLD = 2  # minimum movement per frame to count as swerving
+SWERVE_MOVEMENT_THRESHOLD = 1  # minimum movement per frame to count as swerving
+PROXIMITY_WARNING_DISTANCE = 150  # distance in pixels to trigger proximity warning
+TRAFFIC_NOTIFICATION_DURATION = 2.0  # seconds to show traffic notification
 
 
 class FeedbackHUD:
-    def __init__(self, font_size=32):
+    def __init__(self, font_size=24):  # Reduced from 36 to 24
         pygame.font.init()
-        self.font = pygame.font.Font(None, font_size)
+        # Try to use a system font for better readability
+        try:
+            self.font = pygame.font.SysFont('Arial', font_size, bold=False)  # Less bold
+            self.bold_font = pygame.font.SysFont('Arial', font_size, bold=True)  # Reduced size difference
+        except:
+            # Fallback to default font if system font isn't available
+            self.font = pygame.font.Font(None, font_size)
+            self.bold_font = pygame.font.Font(None, font_size + 2)  # Reduced size difference
+        
         self.mild_warning = None
         self.high_warning = None
         self.overspeed_warning = None
         self.swerve_warning = None
+        self.proximity_warning = None
+        self.traffic_notification = None
         self.warning_timer = 0
         self._last_x = None
+        self._traffic_notification_start = None
         self._swerve_start_time = None
         self._swerve_active = False
         self._stable_frames = 0
 
-    def update(self, speed, player_x=None):
+    def _draw_hud_warning(self, surface, text, color, y_pos):
+        """Draw a modern HUD-style warning with translucent background and styling"""
+        # Render text with antialiasing for better readability
+        text_surface = self.bold_font.render(text, True, (255, 255, 255))
+        
+        # Calculate dimensions with smaller, more aesthetic padding
+        padding_x = 16  # Reduced from 30
+        padding_y = 8   # Reduced from 15
+        total_width = text_surface.get_width() + (padding_x * 2)
+        total_height = text_surface.get_height() + (padding_y * 2)
+        
+        # Center position
+        x_pos = (surface.get_width() - total_width) // 2
+        
+        # Create translucent background surface with more subtle styling
+        bg_surface = pygame.Surface((total_width, total_height), pygame.SRCALPHA)
+        
+        # Draw background with more subtle opacity for aesthetic appeal
+        bg_color = (*color[:3], 100)  # More subtle background
+        border_color = (*color[:3], 180)  # Softer border
+        
+        # Smaller, more subtle shadow effect
+        shadow_offset = 2  # Reduced from 3
+        shadow_surface = pygame.Surface((total_width, total_height), pygame.SRCALPHA)
+        pygame.draw.rect(shadow_surface, (0, 0, 0, 40), (shadow_offset, shadow_offset, total_width, total_height), border_radius=6)  # Smaller radius
+        surface.blit(shadow_surface, (x_pos, y_pos))
+        
+        # Main background with smaller border radius for sleeker look
+        pygame.draw.rect(bg_surface, bg_color, (0, 0, total_width, total_height), border_radius=6)
+        
+        # Thinner, more elegant border
+        pygame.draw.rect(bg_surface, border_color, (0, 0, total_width, total_height), width=2, border_radius=6)
+        
+        # Smaller top highlight line for subtle HUD effect
+        highlight_color = (*color[:3], 200)  # Less intense highlight
+        pygame.draw.rect(bg_surface, highlight_color, (2, 2, total_width-4, 2), border_radius=1)  # Thinner highlight
+        
+        # Blit background to main surface
+        surface.blit(bg_surface, (x_pos, y_pos))
+        
+        # Draw text centered
+        text_x = x_pos + padding_x
+        text_y = y_pos + padding_y
+        
+        # Subtler text shadow for better readability
+        shadow_surface = self.bold_font.render(text, True, (0, 0, 0))
+        surface.blit(shadow_surface, (text_x + 1, text_y + 1))  # Smaller shadow offset
+        
+        # Draw main text
+        surface.blit(text_surface, (text_x, text_y))
+        
+        return total_height + 12  # Reduced spacing between warnings for more compact layout
+
+    def show_traffic_enabled_notification(self):
+        """Show a notification that traffic has been enabled"""
+        self.traffic_notification = "Traffic Enabled"
+        self._traffic_notification_start = time.time()
+
+    def update(self, speed, player_x=None, player_y=None, traffic_vehicles=None):
         """
-        Update feedback messages based on current speed and x position.
+        Update feedback messages based on current speed, position, and traffic.
         :param speed: Current speed of the player (float/int)
         :param player_x: Current x position of the player (float/int)
+        :param player_y: Current y position of the player (float/int)
+        :param traffic_vehicles: List of traffic vehicles with positions
         """
         self.mild_warning = None
         self.high_warning = None
         self.overspeed_warning = None
         self.swerve_warning = None
+        self.proximity_warning = None
         
         now = time.time()
+        
+        # Check if traffic notification should be cleared
+        if self.traffic_notification and self._traffic_notification_start:
+            if now - self._traffic_notification_start > TRAFFIC_NOTIFICATION_DURATION:
+                self.traffic_notification = None
+                self._traffic_notification_start = None
         
         # Swerve detection
         if player_x is not None and self._last_x is not None:
@@ -69,31 +150,46 @@ class FeedbackHUD:
         if player_x is not None:
             self._last_x = player_x
         
+        # Proximity detection to traffic vehicles
+        if player_x is not None and player_y is not None and traffic_vehicles:
+            for vehicle in traffic_vehicles:
+                # Calculate distance between player and traffic vehicle
+                dx = player_x - vehicle.world_x
+                dy = player_y - vehicle.world_y
+                distance = (dx**2 + dy**2)**0.5
+                
+                if distance < PROXIMITY_WARNING_DISTANCE:
+                    self.proximity_warning = "Too close to traffic! Maintain safe distance."
+                    break  # Only need to warn once
+        
         if speed < STOPPED_SPEED_THRESHOLD:
             self.high_warning = "Stopped: Safely pull over to the left if you want to stop."
         elif speed < SLOW_SPEED_THRESHOLD:
             self.mild_warning = "Driving slow on highways isn't safe."
-        if speed > OVERSPEED_THRESHOLD:
+        elif speed > OVERSPEED_THRESHOLD:
             self.overspeed_warning = "Overspeeding! Slow down to avoid accidents."
 
     def draw(self, surface):
-        y = 40
+        y = 30  # Start higher for better positioning with smaller warnings
+        
+        # Informational notifications first (blue)
+        if self.traffic_notification:
+            y += self._draw_hud_warning(surface, self.traffic_notification, INFO_COLOR, y)
+        
+        # High priority warnings (red)
         if self.high_warning:
-            text_surface = self.font.render(self.high_warning, True, HIGH_WARNING_COLOR)
-            rect = text_surface.get_rect(center=(surface.get_width()//2, y))
-            surface.blit(text_surface, rect)
-            y += 50
-        if self.overspeed_warning:
-            text_surface = self.font.render(self.overspeed_warning, True, OVERSPEED_COLOR)
-            rect = text_surface.get_rect(center=(surface.get_width()//2, y))
-            surface.blit(text_surface, rect)
-            y += 50
+            y += self._draw_hud_warning(surface, self.high_warning, HIGH_WARNING_COLOR, y)
+        
+        if self.proximity_warning:
+            y += self._draw_hud_warning(surface, self.proximity_warning, HIGH_WARNING_COLOR, y)
+        
         if self.swerve_warning:
-            text_surface = self.font.render(self.swerve_warning, True, HIGH_WARNING_COLOR)
-            rect = text_surface.get_rect(center=(surface.get_width()//2, y))
-            surface.blit(text_surface, rect)
-            y += 50
+            y += self._draw_hud_warning(surface, self.swerve_warning, HIGH_WARNING_COLOR, y)
+        
+        # Medium priority warnings (orange)
+        if self.overspeed_warning:
+            y += self._draw_hud_warning(surface, self.overspeed_warning, OVERSPEED_COLOR, y)
+        
+        # Low priority warnings (yellow)
         if self.mild_warning:
-            text_surface = self.font.render(self.mild_warning, True, MILD_WARNING_COLOR)
-            rect = text_surface.get_rect(center=(surface.get_width()//2, y))
-            surface.blit(text_surface, rect)
+            y += self._draw_hud_warning(surface, self.mild_warning, MILD_WARNING_COLOR, y)

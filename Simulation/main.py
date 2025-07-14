@@ -49,7 +49,12 @@ class Game:
                     return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_t:
+                    # Check if traffic was disabled before toggling
+                    was_disabled = not getattr(self.traffic_manager, 'enabled', False)
                     self.traffic_manager.toggle()
+                    # Show notification if traffic was just enabled
+                    if was_disabled and getattr(self.traffic_manager, 'enabled', False):
+                        self.feedback_hud.show_traffic_enabled_notification()
 
         keys = pygame.key.get_pressed()
         self.player.handle_input(keys)
@@ -58,8 +63,17 @@ class Game:
     def update(self):
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
-        # Update feedback HUD with current speed and x position
-        self.feedback_hud.update(self.player.speed, player_x=self.player.x)
+        
+        # Get traffic vehicles for proximity detection
+        traffic_vehicles = list(self.traffic_manager.vehicles.values()) if hasattr(self.traffic_manager, 'vehicles') else []
+        
+        # Update feedback HUD with current speed, position, and traffic data
+        self.feedback_hud.update(
+            self.player.speed, 
+            player_x=self.player.x, 
+            player_y=self.player.world_y,
+            traffic_vehicles=traffic_vehicles
+        )
         # Play/stop traffic sound based on traffic enabled
         if getattr(self.traffic_manager, 'enabled', False): #checks the enabled attribute of traffic. Default returns False
             if not self.traffic_sound.is_playing():
