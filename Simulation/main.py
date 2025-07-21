@@ -47,7 +47,10 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
                     return False
-            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    # End simulation and show feedback screen
+                    self.show_feedback_screen()
+                    return False
                 if event.key == pygame.K_t:
                     # Check if traffic was disabled before toggling
                     was_disabled = not getattr(self.traffic_manager, 'enabled', False)
@@ -59,6 +62,58 @@ class Game:
         keys = pygame.key.get_pressed()
         self.player.handle_input(keys)
         return True
+
+    def show_feedback_screen(self):
+        # Show a black screen with scrollable white text from ai_feedback.txt
+        feedback_path = os.path.join(os.path.dirname(__file__), 'Logs', 'ai_feedback.txt')
+        try:
+            with open(feedback_path, 'r', encoding='utf-8') as f:
+                feedback_text = f.read()
+        except Exception as e:
+            feedback_text = f"Could not load feedback: {e}"
+
+        pygame.font.init()
+        font = pygame.font.SysFont('arial', 28)
+        lines = []
+        for line in feedback_text.split('\n'):
+            # Wrap long lines
+            while len(line) > 0:
+                # Try to fit as much as possible in one line
+                cut = len(line)
+                while font.size(line[:cut])[0] > self.screen.get_width() - 40 and cut > 0:
+                    cut -= 1
+                if cut == 0:
+                    break
+                lines.append(line[:cut])
+                line = line[cut:]
+
+        scroll = 0
+        max_scroll = max(0, len(lines) * 36 - self.screen.get_height() + 40)
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                        running = False
+                    elif event.key == pygame.K_UP:
+                        scroll = max(0, scroll - 36)
+                    elif event.key == pygame.K_DOWN:
+                        scroll = min(max_scroll, scroll + 36)
+            self.screen.fill((0, 0, 0))
+            y = 20 - scroll
+            for line in lines:
+                text_surface = font.render(line, True, (255, 255, 255))
+                self.screen.blit(text_surface, (20, y))
+                y += 36
+            # Draw instructions
+            instr_font = pygame.font.SysFont('arial', 20)
+            instr = "UP/DOWN to scroll, ESC or Q to exit"
+            instr_surface = instr_font.render(instr, True, (200, 200, 200))
+            self.screen.blit(instr_surface, (20, self.screen.get_height() - 30))
+            pygame.display.flip()
+            self.clock.tick(30)
 
     def update(self):
         self.player.update()
