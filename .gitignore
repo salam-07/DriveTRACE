@@ -21,3 +21,4 @@ Simulation/__pycache__/sounds.cpython-313.pyc
 *.env
 Simulation/Logs/ai_feedback.txt
 Simulation/Logs/driving_warnings.csv
+Simulation/Logs/driving_warnings.csv
