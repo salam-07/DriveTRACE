@@ -1,4 +1,8 @@
 import pygame
+import time
+import datetime
+import os
+import csv
 
 # Feedback thresholds (tune as needed)
 
@@ -47,6 +51,34 @@ class FeedbackHUD:
         self._swerve_start_time = None
         self._swerve_active = False
         self._stable_frames = 0
+        
+        # Warning logging system
+        self._setup_warning_log()
+        self._last_warnings = set()  # Track previous warnings to avoid duplicates
+
+    def _setup_warning_log(self):
+        """Initialize the warning log file"""
+        self.log_dir = os.path.join(os.path.dirname(__file__), "Logs")
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+        
+        self.log_file_path = os.path.join(self.log_dir, "driving_warnings.csv")
+        
+        # Create new log file (overwrite existing)
+        with open(self.log_file_path, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Timestamp', 'Warning_Type', 'Warning_Message', 'Player_Speed', 'Player_X', 'Player_Y'])
+
+    def _log_warning(self, warning_type, warning_message, speed=None, player_x=None, player_y=None):
+        """Log a warning to the CSV file"""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]  # Include milliseconds
+        
+        try:
+            with open(self.log_file_path, 'a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow([timestamp, warning_type, warning_message, speed, player_x, player_y])
+        except Exception as e:
+            print(f"Error logging warning: {e}")
 
     def _draw_hud_warning(self, surface, text, color, y_pos):
         """Draw a modern HUD-style warning with translucent background and styling"""
@@ -172,8 +204,35 @@ class FeedbackHUD:
             self.high_warning = "Stopped: Safely pull over to the left if you want to stop."
         elif speed < SLOW_SPEED_THRESHOLD:
             self.mild_warning = "Driving slow on highways isn't safe."
-        elif speed > OVERSPEED_THRESHOLD:
+        if speed > OVERSPEED_THRESHOLD:
             self.overspeed_warning = "Overspeeding! Slow down to avoid accidents."
+        
+        # Log any active warnings
+        self._log_active_warnings(speed, player_x, player_y)
+
+    def _log_active_warnings(self, speed, player_x, player_y):
+        """Log all currently active warnings to avoid duplicate logging"""
+        current_warnings = set()
+        
+        # Collect all active warnings
+        warnings_to_check = [
+            ('COLLISION', self.collision_warning),
+            ('PROXIMITY', self.proximity_warning),
+            ('SWERVING', self.swerve_warning),
+            ('STOPPED', self.high_warning),
+            ('SLOW_DRIVING', self.mild_warning),
+            ('OVERSPEEDING', self.overspeed_warning)
+        ]
+        
+        for warning_type, warning_message in warnings_to_check:
+            if warning_message:
+                current_warnings.add(warning_type)
+                # Only log if this is a new warning (not logged recently)
+                if warning_type not in self._last_warnings:
+                    self._log_warning(warning_type, warning_message, speed, player_x, player_y)
+        
+        # Update the set of last warnings
+        self._last_warnings = current_warnings
 
     def draw(self, surface):
         y = 30  # Start higher for better positioning with smaller warnings
