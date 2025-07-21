@@ -17,3 +17,5 @@ Simulation/__pycache__/player.cpython-313.pyc
 Simulation/__pycache__/config.cpython-313.pyc
 Simulation/__pycache__/player.cpython-313.pyc
 Simulation/__pycache__/sounds.cpython-313.pyc
+.env
+*.env
