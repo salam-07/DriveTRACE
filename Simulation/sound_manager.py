@@ -8,12 +8,38 @@ class SoundManager:
         self.car_sound = CarSound()
         self.car_sound_timer = pygame.time.get_ticks() + 4000  # 4 seconds after ignition
         self.car_sound_started = False
+        self.paused = False
+        self.was_traffic_playing = False
+        self.was_car_playing = False
         
         # Play ignition sound at startup
         self.ignition_sound.play(loops=0)
     
+    def pause_all_sounds(self):
+        """Pause all currently playing sounds"""
+        self.paused = True
+        self.was_traffic_playing = self.traffic_sound.is_playing()
+        self.was_car_playing = self.car_sound_started and hasattr(self.car_sound, 'sound') and self.car_sound.sound.get_num_channels() > 0
+        
+        if self.was_traffic_playing:
+            self.traffic_sound.stop()
+        if self.was_car_playing:
+            self.car_sound.stop()
+    
+    def resume_all_sounds(self):
+        """Resume previously playing sounds"""
+        self.paused = False
+        
+        if self.was_traffic_playing:
+            self.traffic_sound.play()
+        if self.was_car_playing:
+            self.car_sound.play(loops=-1)
+    
     def update(self, traffic_enabled):
         """Update sound states based on game state"""
+        if self.paused:
+            return  # Don't update sounds when paused
+            
         # Play/stop traffic sound based on traffic enabled
         if traffic_enabled:
             if not self.traffic_sound.is_playing():

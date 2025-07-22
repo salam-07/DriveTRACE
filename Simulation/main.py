@@ -94,7 +94,8 @@ class Game:
                 self.pause_menu, 
                 self.feedback_screen, 
                 self.clock, 
-                self.screen
+                self.screen,
+                self.sound_manager
             )
             
             if result == False:
