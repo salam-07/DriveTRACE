@@ -24,6 +24,7 @@ def get_gemini_feedback(warnings, api_key):
     headers = {"Content-Type": "application/json"}
     prompt = (
         "You are a professional driving instructor. "
+        "Make your response feel personalized, using words like you, your, and I. "
         "Given the following driving warnings (from a driving simulation), provide concise, actionable feedback for the driver. "
         "Point out specific bad habits but dont repeat the warnings' text, explain why they are dangerous, and give actionable advice on how to improve. "
         "The list of warnings is: stopped, slow driving, swerving, speeding, proximity to traffic and collisions. If any of these is detected less, or not at all, appreciate it"
