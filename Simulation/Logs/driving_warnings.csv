@@ -1,2 +1,6 @@
 Timestamp,Warning_Type,Warning_Message,Player_Speed,Player_X,Player_Y
-2025-07-22 10:19:45.406,STOPPED,Stopped: Safely pull over to the left if you want to stop.,0,650.0,0.0
+2025-07-22 10:25:55.402,STOPPED,Stopped: Safely pull over to the left if you want to stop.,0,650.0,0.0
+2025-07-22 10:25:56.554,SLOW_DRIVING,Driving slow on highways isn't safe.,1.1666666666666667,650.0,0.019444444444444445
+2025-07-22 10:25:57.717,COLLISION,COLLISION! Vehicle contact detected!,74.66666666666666,650.0,40.444444444444436
+2025-07-22 10:25:58.961,PROXIMITY,Too close to traffic! Maintain safe distance.,163.33333333333326,625.2791279989403,184.70454935532857
+2025-07-22 10:26:00.193,OVERSPEEDING,Overspeeding! Slow down to avoid accidents.,250.83333333333255,553.8716620048104,395.3830740550318

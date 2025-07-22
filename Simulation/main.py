@@ -1,13 +1,16 @@
 
 import pygame
 import sys
+import os
 from config import *
 from player import Player
 from csv_traffic import CSVTrafficManager
-import os
-from ai_feedback import generate_and_save_feedback
-# Import FeedbackHUD
 from feedback import FeedbackHUD
+from pause_menu import PauseMenu
+from feedback_screen import FeedbackScreen
+from renderer import Renderer
+from input_handler import InputHandler
+from sound_manager import SoundManager
 
 ICON_PATH = os.path.join(os.path.dirname(__file__), "Assets/ui/logo3.png")
 
@@ -27,169 +30,20 @@ class Game:
                                               (ROAD_TILE_WIDTH, ROAD_TILE_HEIGHT))
         self.road_y_offset = 0
 
-        # Create player and traffic
+        # Create game components
         self.player = Player(WINDOW_WIDTH // 2, WINDOW_HEIGHT * 0.8)
         self.traffic_manager = CSVTrafficManager()
-
-        # Feedback HUD
         self.feedback_hud = FeedbackHUD()
-
-        # Pause menu state
-        self.paused = False
-        self.pause_menu_selection = 0  # 0: Resume, 1: Exit and Get AI Feedback, 2: Exit
-
-        # Traffic and ignition sounds
-        from sounds import TrafficSound, IgnitionSound, CarSound
-        self.traffic_sound = TrafficSound()
-        self.ignition_sound = IgnitionSound()
-        self.car_sound = CarSound()
-        self.ignition_sound.play(loops=0)
-        self.car_sound_timer = pygame.time.get_ticks() + 4000  # 4 seconds after ignition
-        self.car_sound_started = False
-
-    def handle_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if self.paused:
-                    # Handle pause menu navigation
-                    if event.key == pygame.K_UP:
-                        self.pause_menu_selection = (self.pause_menu_selection - 1) % 3
-                    elif event.key == pygame.K_DOWN:
-                        self.pause_menu_selection = (self.pause_menu_selection + 1) % 3
-                    elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
-                        if self.pause_menu_selection == 0:  # Resume
-                            self.paused = False
-                        elif self.pause_menu_selection == 1:  # Exit and Get AI Feedback
-                            generate_and_save_feedback()
-                            self.show_feedback_screen()
-                            return False
-                        elif self.pause_menu_selection == 2:  # Exit
-                            return False
-                    elif event.key == pygame.K_ESCAPE:
-                        self.paused = False
-                else:
-                    # Handle normal game input
-                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
-                        return False
-                    elif event.key == pygame.K_SPACE:
-                        self.paused = True
-                        self.pause_menu_selection = 0  # Default to Resume
-                    elif event.key == pygame.K_e:
-                        # Generate feedback before showing feedback screen
-                        generate_and_save_feedback()
-                        self.show_feedback_screen()
-                        return False
-                    elif event.key == pygame.K_t:
-                        # Check if traffic was disabled before toggling
-                        was_disabled = not getattr(self.traffic_manager, 'enabled', False)
-                        self.traffic_manager.toggle()
-                        # Show notification if traffic was just enabled
-                        if was_disabled and getattr(self.traffic_manager, 'enabled', False):
-                            self.feedback_hud.show_traffic_enabled_notification()
-
-        if not self.paused:
-            keys = pygame.key.get_pressed()
-            self.player.handle_input(keys)
-        return True
-
-    def show_feedback_screen(self):
-        # Show a black screen with scrollable white text from ai_feedback.txt, improved readability
-        feedback_path = os.path.join(os.path.dirname(__file__), 'Logs', 'ai_feedback.txt')
-        try:
-            with open(feedback_path, 'r', encoding='utf-8') as f:
-                feedback_text = f.read()
-        except Exception as e:
-            feedback_text = f"Could not load feedback: {e}"
-
-        pygame.font.init()
-        font = pygame.font.SysFont('consolas', 24)  # Monospace font for better readability
-        line_spacing = 8
-        text_color = (240, 240, 240)  # Slightly softer white
-        bg_color = (15, 15, 20)  # Dark blue-ish background
-        text_bg_color = (15, 15, 20)  # Semi-transparent dark background for text area
-        margin_x = 100
-        margin_y = 60
-        max_width = min(1000, self.screen.get_width() - 2 * margin_x)  # Limit line length for readability
-
-        # Word wrap for better readability with optimal line length
-        def wrap_text(text, font, max_width):
-            words = text.split()
-            lines = []
-            current_line = ''
-            for word in words:
-                test_line = current_line + (' ' if current_line else '') + word
-                if font.size(test_line)[0] <= max_width:
-                    current_line = test_line
-                else:
-                    if current_line:
-                        lines.append(current_line)
-                        current_line = word
-                    else:
-                        # Handle very long words
-                        lines.append(word)
-            if current_line:
-                lines.append(current_line)
-            return lines
-
-        # Split feedback into paragraphs, then wrap each
-        lines = []
-        for para in feedback_text.split('\n'):
-            if para.strip() == '':
-                lines.append('')
-            else:
-                lines.extend(wrap_text(para, font, max_width))
-
-        line_height = font.get_height() + line_spacing
-        scroll = 0
-        max_scroll = max(0, len(lines) * line_height - self.screen.get_height() + margin_y)
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
-                        running = False
-                    elif event.key == pygame.K_UP:
-                        scroll = max(0, scroll - line_height)
-                    elif event.key == pygame.K_DOWN:
-                        scroll = min(max_scroll, scroll + line_height)
-            self.screen.fill(bg_color)
-            # Draw semi-transparent rectangle for text area with rounded corners effect
-            text_area_width = self.screen.get_width() - 2 * margin_x
-            text_area_height = self.screen.get_height() - 2 * margin_y
-            s = pygame.Surface((text_area_width, text_area_height), pygame.SRCALPHA)
-            s.fill(text_bg_color)
-            self.screen.blit(s, (margin_x, margin_y))
-            
-            # Render text with better vertical spacing
-            y = margin_y + 30 - scroll
-            for line in lines:
-                if line.strip() == '':
-                    y += line_height // 2
-                    continue
-                if y > margin_y - line_height and y < self.screen.get_height() - margin_y:  # Only render visible lines
-                    text_surface = font.render(line, True, text_color)
-                    self.screen.blit(text_surface, (margin_x + 30, y))
-                y += line_height
-            
-            # Draw title and instructions with better styling
-            title_font = pygame.font.SysFont('segoeui', 28, bold=True)
-            title_text = "AI Driving Instructor Feedback"
-            title_surface = title_font.render(title_text, True, (200, 220, 255))
-            title_x = (self.screen.get_width() - title_surface.get_width()) // 2
-            self.screen.blit(title_surface, (title_x, 20))
-            
-            instr_font = pygame.font.SysFont('segoeui', 20)
-            instr = "UP/DOWN arrows to scroll • ESC or Q to exit"
-            instr_surface = instr_font.render(instr, True, (160, 180, 200))
-            instr_x = (self.screen.get_width() - instr_surface.get_width()) // 2
-            self.screen.blit(instr_surface, (instr_x, self.screen.get_height() - 35))
-            pygame.display.flip()
-            self.clock.tick(30)
+        
+        # Create modular components
+        self.pause_menu = PauseMenu()
+        self.feedback_screen = FeedbackScreen()
+        self.renderer = Renderer(self.screen)
+        self.input_handler = InputHandler()
+        self.sound_manager = SoundManager()
 
     def update(self):
-        if self.paused:
+        if self.input_handler.paused:
             return  # Don't update anything when paused
             
         self.player.update()
@@ -205,108 +59,60 @@ class Game:
             player_y=self.player.world_y,
             traffic_vehicles=traffic_vehicles
         )
-        # Play/stop traffic sound based on traffic enabled
-        if getattr(self.traffic_manager, 'enabled', False): #checks the enabled attribute of traffic. Default returns False
-            if not self.traffic_sound.is_playing():
-                #if traffic traffic is enabled and sound is not playing, play it
-                self.traffic_sound.play()
-        else:
-            #if traffic is disabled and sound is playing, stop it
-            if self.traffic_sound.is_playing():
-                self.traffic_sound.stop()
-
-        #car driving sound
-        # Start car sound 4 seconds after ignition
-        now = pygame.time.get_ticks()
-        #if not already playing and after the set 4 second timer.
-        if not self.car_sound_started and now >= self.car_sound_timer:
-            self.car_sound.play(loops=-1) #loop infinite times
-            self.car_sound_started = True
+        
+        # Update sounds
+        traffic_enabled = getattr(self.traffic_manager, 'enabled', False)
+        self.sound_manager.update(traffic_enabled)
 
         # Update road scroll position (now based on player world_y)
         self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 
-    def draw_pause_menu(self):
-        # Draw semi-transparent overlay
-        overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))
-        self.screen.blit(overlay, (0, 0))
-        
-        # Menu dimensions and positioning - made wider to accommodate text
-        menu_width = 500
-        menu_height = 350
-        menu_x = (WINDOW_WIDTH - menu_width) // 2
-        menu_y = (WINDOW_HEIGHT - menu_height) // 2
-        
-        # Draw menu background
-        pygame.draw.rect(self.screen, (40, 40, 50), (menu_x, menu_y, menu_width, menu_height))
-        pygame.draw.rect(self.screen, (120, 120, 140), (menu_x, menu_y, menu_width, menu_height), 3)
-        
-        # Fixed-size fonts
-        title_font = pygame.font.SysFont('arial', 36, bold=True)
-        option_font = pygame.font.SysFont('arial', 24)
-        instr_font = pygame.font.SysFont('arial', 18)
-        
-        # Title
-        title_text = "PAUSED"
-        title_surface = title_font.render(title_text, True, (255, 255, 255))
-        title_x = menu_x + (menu_width - title_surface.get_width()) // 2
-        self.screen.blit(title_surface, (title_x, menu_y + 40))
-        
-        # Menu options with fixed positioning
-        options = ["Resume", "Exit and Get AI Feedback", "Exit"]
-        option_y_start = menu_y + 120
-        option_height = 45
-        
-        for i, option in enumerate(options):
-            y_pos = option_y_start + i * option_height
-            
-            # Draw option background if selected
-            if i == self.pause_menu_selection:
-                pygame.draw.rect(self.screen, (70, 70, 90), 
-                               (menu_x + 20, y_pos - 5, menu_width - 40, option_height - 10))
-            
-            # Draw option text
-            color = (200, 200, 255) if i == self.pause_menu_selection else (200, 200, 200)
-            text_surface = option_font.render(option, True, color)
-            text_x = menu_x + 40  # Left-aligned with padding
-            self.screen.blit(text_surface, (text_x, y_pos))
-        
-        # Instructions at bottom
-        instr_text = "UP/DOWN to navigate • ENTER/SPACE to select • ESC to resume"
-        instr_surface = instr_font.render(instr_text, True, (160, 160, 160))
-        instr_x = menu_x + (menu_width - instr_surface.get_width()) // 2
-        self.screen.blit(instr_surface, (instr_x, menu_y + menu_height - 30))
-
     def draw(self):
-        self.screen.fill(BLACK)
-        center_y = int(WINDOW_HEIGHT * 0.8)
-        # Draw road tiles and scroll them
-        for y in range(-3, 3): 
-            tile_y = y * ROAD_TILE_HEIGHT + center_y + self.road_y_offset
-            self.screen.blit(self.road_tile, (0, tile_y))
-        self.traffic_manager.draw(self.screen, self.player.world_y, center_y)
-        self.player.draw(self.screen, int(self.player.x), center_y)
-        # Draw feedback HUD
-        self.feedback_hud.draw(self.screen)
+        # Draw background
+        self.renderer.draw_background(self.road_tile, self.road_y_offset)
+        
+        # Draw game objects
+        self.renderer.draw_game_objects(
+            self.traffic_manager, 
+            self.player, 
+            self.feedback_hud, 
+            self.player.world_y
+        )
         
         # Draw pause menu if paused
-        if self.paused:
-            self.draw_pause_menu()
+        if self.input_handler.paused:
+            self.pause_menu.draw(self.screen)
         
-        # Draw debug info
-        # if hasattr(self.traffic_manager, 'get_debug_info'):
-        #     debug_text = self.traffic_manager.get_debug_info()
-        #     font = pygame.font.Font(None, 36)
-        #     text_surface = font.render(debug_text, True, WHITE)
-        #     self.screen.blit(text_surface, (10, 10))
-        
-        pygame.display.flip()
+        # Finalize frame
+        self.renderer.finalize_frame()
 
     def run(self):
         running = True
         while running:
-            running = self.handle_input()
+            # Handle input
+            result = self.input_handler.handle_events(
+                self.pause_menu, 
+                self.feedback_screen, 
+                self.clock, 
+                self.screen
+            )
+            
+            if result == False:
+                running = False
+            elif result == 'toggle_traffic':
+                # Check if traffic was disabled before toggling
+                was_disabled = not getattr(self.traffic_manager, 'enabled', False)
+                self.traffic_manager.toggle()
+                # Show notification if traffic was just enabled
+                if was_disabled and getattr(self.traffic_manager, 'enabled', False):
+                    self.feedback_hud.show_traffic_enabled_notification()
+            
+            # Handle continuous input for player movement
+            keys = self.input_handler.get_continuous_input()
+            if keys:
+                self.player.handle_input(keys)
+            
+            # Update and draw
             self.update()
             self.draw()
             self.clock.tick(FPS)
