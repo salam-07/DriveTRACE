@@ -1,11 +1,12 @@
 import pygame
-from sounds import TrafficSound, IgnitionSound, CarSound
+from sounds import TrafficSound, IgnitionSound, CarSound, CrashSound
 
 class SoundManager:
     def __init__(self):
         self.traffic_sound = TrafficSound()
         self.ignition_sound = IgnitionSound()
         self.car_sound = CarSound()
+        self.crash_sound = CrashSound()
         self.car_sound_timer = pygame.time.get_ticks() + 4000  # 4 seconds after ignition
         self.car_sound_started = False
         self.paused = False
@@ -34,6 +35,11 @@ class SoundManager:
             self.traffic_sound.play()
         if self.was_car_playing:
             self.car_sound.play(loops=-1)
+    
+    def play_crash_sound(self):
+        """Play crash sound effect"""
+        if not self.paused:
+            self.crash_sound.play()
     
     def update(self, traffic_enabled):
         """Update sound states based on game state"""

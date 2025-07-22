@@ -44,6 +44,7 @@ class FeedbackHUD:
         self.swerve_warning = None
         self.proximity_warning = None
         self.collision_warning = None
+        self.previous_collision_state = False  # Track if we were in collision last frame
         self.traffic_notification = None
         self.warning_timer = 0
         self._last_x = None
@@ -138,7 +139,7 @@ class FeedbackHUD:
         self.traffic_notification = "Traffic Enabled"
         self._traffic_notification_start = time.time()
 
-    def update(self, speed, player_x=None, player_y=None, traffic_vehicles=None):
+    def update(self, speed, player_x=None, player_y=None, traffic_vehicles=None, sound_manager=None):
         """
         Update feedback messages based on current speed, position, and traffic.
         :param speed: Current speed of the player (float/int)
@@ -186,6 +187,7 @@ class FeedbackHUD:
             self._last_x = player_x
         
         # Proximity and collision detection to traffic vehicles
+        current_collision_state = False
         if player_x is not None and player_y is not None and traffic_vehicles:
             for vehicle in traffic_vehicles:
                 # Calculate distance between player and traffic vehicle
@@ -195,10 +197,18 @@ class FeedbackHUD:
                 
                 if distance < COLLISION_DISTANCE:
                     self.collision_warning = "COLLISION! Vehicle contact detected!"
+                    current_collision_state = True
                     break  # Collision takes priority over proximity
                 elif distance < PROXIMITY_WARNING_DISTANCE:
                     self.proximity_warning = "Too close to traffic! Maintain safe distance."
                     # Don't break here in case there's a closer collision
+        
+        # Play crash sound when collision first occurs (not continuously)
+        if current_collision_state and not self.previous_collision_state and sound_manager:
+            sound_manager.play_crash_sound()
+        
+        # Update previous collision state for next frame
+        self.previous_collision_state = current_collision_state
         
         if speed < STOPPED_SPEED_THRESHOLD:
             self.high_warning = "Stopped: Safely pull over to the left if you want to stop."

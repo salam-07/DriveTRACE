@@ -70,7 +70,8 @@ class Game:
             self.player.speed, 
             player_x=self.player.x, 
             player_y=self.player.world_y,
-            traffic_vehicles=traffic_vehicles
+            traffic_vehicles=traffic_vehicles,
+            sound_manager=self.sound_manager
         )
         
         # Update sounds
