@@ -2,6 +2,7 @@
 import pygame
 import sys
 import os
+import time
 from config import *
 from player import Player
 from csv_traffic import CSVTrafficManager
@@ -44,6 +45,9 @@ class Game:
         self.input_handler = InputHandler()
         self.sound_manager = SoundManager()
         self.game_ended = False
+        self.collision_detected = False
+        self.collision_start_time = 0
+        self.collision_delay = 2.0  # 2 seconds delay
 
     def change_road(self, road_number):
         """Change the road texture to a different one"""
@@ -65,6 +69,12 @@ class Game:
         if self.game_ended:
             return  # Don't update anything when game has ended
             
+        # Handle collision timing
+        if self.collision_detected:
+            if time.time() - self.collision_start_time >= self.collision_delay:
+                self.game_ended = True
+            return  # Don't update other game elements during collision delay
+            
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
         
@@ -80,10 +90,11 @@ class Game:
             sound_manager=self.sound_manager
         )
         
-        # Check if collision occurred and stop the game
-        if self.feedback_hud.collision_occurred:
+        # Check if collision occurred and start the delay
+        if self.feedback_hud.collision_occurred and not self.collision_detected:
             self.player.stop_vehicle()
-            self.game_ended = True
+            self.collision_detected = True
+            self.collision_start_time = time.time()
         
         # Update sounds
         traffic_enabled = getattr(self.traffic_manager, 'enabled', False)

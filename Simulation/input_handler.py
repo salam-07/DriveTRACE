@@ -60,6 +60,6 @@ class InputHandler:
     
     def get_continuous_input(self, game):
         """Get continuous key presses for player movement"""
-        if not self.paused and not game.game_ended:
+        if not self.paused and not game.game_ended and not game.collision_detected:
             return pygame.key.get_pressed()
         return None
