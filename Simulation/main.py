@@ -42,6 +42,19 @@ class Game:
         self.input_handler = InputHandler()
         self.sound_manager = SoundManager()
 
+    def change_road(self, road_number):
+        """Change the road texture to a different one"""
+        import os
+        road_path = os.path.join(os.path.dirname(__file__), "Assets", "roads", f"road_tile_{road_number}.jpeg")
+        
+        # Fallback to default road if file doesn't exist
+        if not os.path.exists(road_path):
+            road_path = ROAD_ASSET_DIR
+            
+        self.road_tile = pygame.image.load(road_path)
+        self.road_tile = pygame.transform.smoothscale(self.road_tile, 
+                                              (ROAD_TILE_WIDTH, ROAD_TILE_HEIGHT))
+
     def update(self):
         if self.input_handler.paused:
             return  # Don't update anything when paused
@@ -96,7 +109,8 @@ class Game:
                 self.clock, 
                 self.screen,
                 self.sound_manager,
-                self.player
+                self.player,
+                self
             )
             
             if result == False:

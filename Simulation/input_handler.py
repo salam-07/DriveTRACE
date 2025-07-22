@@ -5,7 +5,7 @@ class InputHandler:
     def __init__(self):
         self.paused = False
         
-    def handle_events(self, pause_menu, feedback_screen, clock, screen, sound_manager, player):
+    def handle_events(self, pause_menu, feedback_screen, clock, screen, sound_manager, player, game):
         """Handle all pygame events and return game state"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -23,11 +23,14 @@ class InputHandler:
                             generate_and_save_feedback()
                             feedback_screen.show(screen, clock)
                             return False
-                        elif result == 3:  # Exit (moved to position 3)
+                        elif result == 4:  # Exit (moved to position 4)
                             return False
                         elif result == 'car_changed':
                             # Update player car sprite
                             player.change_car(pause_menu.current_car)
+                        elif result == 'road_changed':
+                            # Update game road texture
+                            game.change_road(pause_menu.current_road)
                 else:
                     # Handle normal game input
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
