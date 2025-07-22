@@ -26,6 +26,7 @@ def get_gemini_feedback(warnings, api_key):
         "You are a professional driving instructor. "
         "Given the following driving warnings (from a driving simulation), provide concise, actionable feedback for the driver. "
         "Point out specific bad habits but dont repeat the warnings' text, explain why they are dangerous, and give actionable advice on how to improve. "
+        "The list of warnings is: stopped, slow driving, swerving, speeding, proximity to traffic and collisions. If any of these is detected less, or not at all, appreciate it"
         "Format your text clearly. No markdown or special formatting needed, just plain text. Have line breaks and numbered lists for clarity. No use of asteriks"
         "Format your response as such: 1. [Problem Detected] (describe issue). Tell Number of occurences. Inform the danger. Inform actionable insights. Use same format for all types of problems."
         "Be constructive, thorough, and use clear language. If a specific warning is shown less times, or more times, acknowledge that as well.\n\n"
