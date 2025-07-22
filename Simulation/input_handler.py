@@ -12,7 +12,17 @@ class InputHandler:
                 return False
                 
             if event.type == pygame.KEYDOWN:
-                if self.paused:
+                if game.game_ended:
+                    # Handle ending screen input
+                    result = game.ending_screen.handle_input(event)
+                    if result is not None:
+                        if result == 0:  # Exit with AI Feedback
+                            generate_and_save_feedback()
+                            feedback_screen.show(screen, clock)
+                            return False
+                        elif result == 1:  # Exit without AI Feedback
+                            return False
+                elif self.paused:
                     # Handle pause menu navigation
                     result = pause_menu.handle_input(event)
                     if result is not None:
@@ -48,8 +58,8 @@ class InputHandler:
                         return 'toggle_traffic'
         return True
     
-    def get_continuous_input(self):
+    def get_continuous_input(self, game):
         """Get continuous key presses for player movement"""
-        if not self.paused:
+        if not self.paused and not game.game_ended:
             return pygame.key.get_pressed()
         return None

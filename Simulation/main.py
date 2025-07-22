@@ -8,6 +8,7 @@ from csv_traffic import CSVTrafficManager
 from feedback import FeedbackHUD
 from pause_menu import PauseMenu
 from feedback_screen import FeedbackScreen
+from ending_screen import EndingScreen
 from renderer import Renderer
 from input_handler import InputHandler
 from sound_manager import SoundManager
@@ -38,9 +39,11 @@ class Game:
         # Create modular components
         self.pause_menu = PauseMenu()
         self.feedback_screen = FeedbackScreen()
+        self.ending_screen = EndingScreen()
         self.renderer = Renderer(self.screen)
         self.input_handler = InputHandler()
         self.sound_manager = SoundManager()
+        self.game_ended = False
 
     def change_road(self, road_number):
         """Change the road texture to a different one"""
@@ -58,6 +61,9 @@ class Game:
     def update(self):
         if self.input_handler.paused:
             return  # Don't update anything when paused
+        
+        if self.game_ended:
+            return  # Don't update anything when game has ended
             
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
@@ -73,6 +79,11 @@ class Game:
             traffic_vehicles=traffic_vehicles,
             sound_manager=self.sound_manager
         )
+        
+        # Check if collision occurred and stop the game
+        if self.feedback_hud.collision_occurred:
+            self.player.stop_vehicle()
+            self.game_ended = True
         
         # Update sounds
         traffic_enabled = getattr(self.traffic_manager, 'enabled', False)
@@ -96,6 +107,10 @@ class Game:
         # Draw pause menu if paused
         if self.input_handler.paused:
             self.pause_menu.draw(self.screen)
+        
+        # Draw ending screen if game has ended
+        if self.game_ended:
+            self.ending_screen.draw(self.screen)
         
         # Finalize frame
         self.renderer.finalize_frame()
@@ -125,7 +140,7 @@ class Game:
                     self.feedback_hud.show_traffic_enabled_notification()
             
             # Handle continuous input for player movement
-            keys = self.input_handler.get_continuous_input()
+            keys = self.input_handler.get_continuous_input(self)
             if keys:
                 self.player.handle_input(keys)
             

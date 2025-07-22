@@ -45,6 +45,7 @@ class FeedbackHUD:
         self.proximity_warning = None
         self.collision_warning = None
         self.previous_collision_state = False  # Track if we were in collision last frame
+        self.collision_occurred = False  # Flag to signal game end
         self.traffic_notification = None
         self.warning_timer = 0
         self._last_x = None
@@ -206,6 +207,7 @@ class FeedbackHUD:
         # Play crash sound when collision first occurs (not continuously)
         if current_collision_state and not self.previous_collision_state and sound_manager:
             sound_manager.play_crash_sound()
+            self.collision_occurred = True  # Signal game to end
         
         # Update previous collision state for next frame
         self.previous_collision_state = current_collision_state

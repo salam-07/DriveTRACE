@@ -43,6 +43,12 @@ class Player:
         self._load_car_image()
         self.rect.center = old_center  # Maintain position
 
+    def stop_vehicle(self):
+        """Stop the vehicle immediately (for collisions)"""
+        self.speed = 0
+        self.target_speed = 0
+        self.acceleration = 0
+
     def handle_input(self, keys):
         # Speed control with number keys
         for i in range(10):
