@@ -7,16 +7,9 @@ from config import *
 
 class Player:
     def __init__(self, x, y):
-        #load the car asset and scale to choice
-        car_img = pygame.image.load(PLAYER_TILE_ASSET).convert_alpha()
-        new_width = int(LANE_WIDTH * VEHICLE_SCALE)
-        new_height = int((new_width / car_img.get_width()) * car_img.get_height())
-        car_img = pygame.transform.smoothscale(car_img, (new_width, new_height))
-
-        self.original_image = car_img
-        self.image = self.original_image
-        self.rect = self.image.get_rect()
-
+        self.current_car_number = 1  # Default car
+        self._load_car_image()
+        
         self.x = (LANE_COUNT // 2 + 0.5) * LANE_WIDTH
         self.y = 0  # world y
         self.angle = 0  # visual angle
@@ -24,6 +17,31 @@ class Player:
         self.speed = 0
         self.target_speed = 0
         self.acceleration = 0
+
+    def _load_car_image(self):
+        """Load and scale the car image based on current car number"""
+        import os
+        car_path = os.path.join(os.path.dirname(__file__), "Assets", "vehicles", f"car_{self.current_car_number}.png")
+        
+        # Fallback to default car if file doesn't exist
+        if not os.path.exists(car_path):
+            car_path = PLAYER_TILE_ASSET
+            
+        car_img = pygame.image.load(car_path).convert_alpha()
+        new_width = int(LANE_WIDTH * VEHICLE_SCALE)
+        new_height = int((new_width / car_img.get_width()) * car_img.get_height())
+        car_img = pygame.transform.smoothscale(car_img, (new_width, new_height))
+
+        self.original_image = car_img
+        self.image = self.original_image
+        self.rect = self.image.get_rect()
+    
+    def change_car(self, car_number):
+        """Change the player's car to a different model"""
+        self.current_car_number = car_number
+        old_center = self.rect.center
+        self._load_car_image()
+        self.rect.center = old_center  # Maintain position
 
     def handle_input(self, keys):
         # Speed control with number keys
