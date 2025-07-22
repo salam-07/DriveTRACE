@@ -34,6 +34,10 @@ class Game:
         # Feedback HUD
         self.feedback_hud = FeedbackHUD()
 
+        # Pause menu state
+        self.paused = False
+        self.pause_menu_selection = 0  # 0: Resume, 1: Exit and Get AI Feedback, 2: Exit
+
         # Traffic and ignition sounds
         from sounds import TrafficSound, IgnitionSound, CarSound
         self.traffic_sound = TrafficSound()
@@ -46,23 +50,46 @@ class Game:
     def handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
-                    return False
-                if event.key == pygame.K_e:
-                    # Generate feedback before showing feedback screen
-                    generate_and_save_feedback()
-                    self.show_feedback_screen()
-                    return False
-                if event.key == pygame.K_t:
-                    # Check if traffic was disabled before toggling
-                    was_disabled = not getattr(self.traffic_manager, 'enabled', False)
-                    self.traffic_manager.toggle()
-                    # Show notification if traffic was just enabled
-                    if was_disabled and getattr(self.traffic_manager, 'enabled', False):
-                        self.feedback_hud.show_traffic_enabled_notification()
+                if self.paused:
+                    # Handle pause menu navigation
+                    if event.key == pygame.K_UP:
+                        self.pause_menu_selection = (self.pause_menu_selection - 1) % 3
+                    elif event.key == pygame.K_DOWN:
+                        self.pause_menu_selection = (self.pause_menu_selection + 1) % 3
+                    elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                        if self.pause_menu_selection == 0:  # Resume
+                            self.paused = False
+                        elif self.pause_menu_selection == 1:  # Exit and Get AI Feedback
+                            generate_and_save_feedback()
+                            self.show_feedback_screen()
+                            return False
+                        elif self.pause_menu_selection == 2:  # Exit
+                            return False
+                    elif event.key == pygame.K_ESCAPE:
+                        self.paused = False
+                else:
+                    # Handle normal game input
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                        return False
+                    elif event.key == pygame.K_SPACE:
+                        self.paused = True
+                        self.pause_menu_selection = 0  # Default to Resume
+                    elif event.key == pygame.K_e:
+                        # Generate feedback before showing feedback screen
+                        generate_and_save_feedback()
+                        self.show_feedback_screen()
+                        return False
+                    elif event.key == pygame.K_t:
+                        # Check if traffic was disabled before toggling
+                        was_disabled = not getattr(self.traffic_manager, 'enabled', False)
+                        self.traffic_manager.toggle()
+                        # Show notification if traffic was just enabled
+                        if was_disabled and getattr(self.traffic_manager, 'enabled', False):
+                            self.feedback_hud.show_traffic_enabled_notification()
 
-        keys = pygame.key.get_pressed()
-        self.player.handle_input(keys)
+        if not self.paused:
+            keys = pygame.key.get_pressed()
+            self.player.handle_input(keys)
         return True
 
     def show_feedback_screen(self):
@@ -162,6 +189,9 @@ class Game:
             self.clock.tick(30)
 
     def update(self):
+        if self.paused:
+            return  # Don't update anything when paused
+            
         self.player.update()
         self.traffic_manager.update(self.player.speed, self.player.get_lane(), self.player.world_y)
         
@@ -196,6 +226,58 @@ class Game:
         # Update road scroll position (now based on player world_y)
         self.road_y_offset = self.player.world_y % ROAD_TILE_HEIGHT
 
+    def draw_pause_menu(self):
+        # Draw semi-transparent overlay
+        overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        self.screen.blit(overlay, (0, 0))
+        
+        # Menu dimensions and positioning - made wider to accommodate text
+        menu_width = 500
+        menu_height = 350
+        menu_x = (WINDOW_WIDTH - menu_width) // 2
+        menu_y = (WINDOW_HEIGHT - menu_height) // 2
+        
+        # Draw menu background
+        pygame.draw.rect(self.screen, (40, 40, 50), (menu_x, menu_y, menu_width, menu_height))
+        pygame.draw.rect(self.screen, (120, 120, 140), (menu_x, menu_y, menu_width, menu_height), 3)
+        
+        # Fixed-size fonts
+        title_font = pygame.font.SysFont('arial', 36, bold=True)
+        option_font = pygame.font.SysFont('arial', 24)
+        instr_font = pygame.font.SysFont('arial', 18)
+        
+        # Title
+        title_text = "PAUSED"
+        title_surface = title_font.render(title_text, True, (255, 255, 255))
+        title_x = menu_x + (menu_width - title_surface.get_width()) // 2
+        self.screen.blit(title_surface, (title_x, menu_y + 40))
+        
+        # Menu options with fixed positioning
+        options = ["Resume", "Exit and Get AI Feedback", "Exit"]
+        option_y_start = menu_y + 120
+        option_height = 45
+        
+        for i, option in enumerate(options):
+            y_pos = option_y_start + i * option_height
+            
+            # Draw option background if selected
+            if i == self.pause_menu_selection:
+                pygame.draw.rect(self.screen, (70, 70, 90), 
+                               (menu_x + 20, y_pos - 5, menu_width - 40, option_height - 10))
+            
+            # Draw option text
+            color = (200, 200, 255) if i == self.pause_menu_selection else (200, 200, 200)
+            text_surface = option_font.render(option, True, color)
+            text_x = menu_x + 40  # Left-aligned with padding
+            self.screen.blit(text_surface, (text_x, y_pos))
+        
+        # Instructions at bottom
+        instr_text = "UP/DOWN to navigate • ENTER/SPACE to select • ESC to resume"
+        instr_surface = instr_font.render(instr_text, True, (160, 160, 160))
+        instr_x = menu_x + (menu_width - instr_surface.get_width()) // 2
+        self.screen.blit(instr_surface, (instr_x, menu_y + menu_height - 30))
+
     def draw(self):
         self.screen.fill(BLACK)
         center_y = int(WINDOW_HEIGHT * 0.8)
@@ -207,6 +289,10 @@ class Game:
         self.player.draw(self.screen, int(self.player.x), center_y)
         # Draw feedback HUD
         self.feedback_hud.draw(self.screen)
+        
+        # Draw pause menu if paused
+        if self.paused:
+            self.draw_pause_menu()
         
         # Draw debug info
         # if hasattr(self.traffic_manager, 'get_debug_info'):
