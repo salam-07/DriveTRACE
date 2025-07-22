@@ -85,8 +85,8 @@ class PauseMenu:
             
             # Show left/right arrows
             arrow_font = pygame.font.SysFont('arial', 30, bold=True)
-            left_arrow = arrow_font.render("◀", True, (150, 150, 200))
-            right_arrow = arrow_font.render("▶", True, (150, 150, 200))
+            left_arrow = arrow_font.render("<", True, (150, 150, 200))
+            right_arrow = arrow_font.render(">", True, (150, 150, 200))
             screen.blit(left_arrow, (menu_x + 100, menu_y + 145))
             screen.blit(right_arrow, (menu_x + 380, menu_y + 145))
             
