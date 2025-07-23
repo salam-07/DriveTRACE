@@ -15,7 +15,7 @@ END_TIME_SECONDS = None    # End time in seconds (e.g., 80 for 1:20)
 
 # Alternative: specify time ranges as "MM:SS" format
 START_TIME_STRING = "0:00"   # e.g., "0:30" or "1:15"
-END_TIME_STRING = "0:20"     # e.g., "1:20" or "2:45"
+END_TIME_STRING = "0:10"     # e.g., "1:20" or "2:45"
 
 # Detection settings
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # cars, trucks, buses, motorcycles in COCO dataset
