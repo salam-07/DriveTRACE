@@ -22,7 +22,7 @@ import time
 SWERVE_TIME_THRESHOLD = 1.0  # seconds
 SWERVE_MOVEMENT_THRESHOLD = 1  # minimum movement per frame to count as swerving
 PROXIMITY_WARNING_DISTANCE = 270  # distance in pixels to trigger proximity warning
-COLLISION_DISTANCE = 110  # distance in pixels to trigger collision warning
+COLLISION_DISTANCE = 100  # distance in pixels to trigger collision warning
 TRAFFIC_NOTIFICATION_DURATION = 3.0  # seconds to show traffic notification
 
 
