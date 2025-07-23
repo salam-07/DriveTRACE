@@ -4,7 +4,7 @@ Configuration settings for vehicle detection and tracking system.
 
 # Video processing settings
 DEFAULT_MODEL_PATH = "Detection/yolov8m.pt"
-DEFAULT_INPUT_VIDEO = "Detection/test_footage/5.mp4"
+DEFAULT_INPUT_VIDEO = "Detection/test_footage/1.mp4"
 DEFAULT_OUTPUT_VIDEO = "Detection/annotated_test1.mp4"
 DEFAULT_OUTPUT_CSV = "Detection/traffic_simulation_data.csv"
 
@@ -14,8 +14,8 @@ START_TIME_SECONDS = None  # Start time in seconds (e.g., 30 for 0:30)
 END_TIME_SECONDS = None    # End time in seconds (e.g., 80 for 1:20)
 
 # Alternative: specify time ranges as "MM:SS" format
-START_TIME_STRING = "0:00"   # e.g., "0:30" or "1:15"
-END_TIME_STRING = "0:10"     # e.g., "1:20" or "2:45"
+START_TIME_STRING = "0:10"   # e.g., "0:30" or "1:15"
+END_TIME_STRING = "0:20"     # e.g., "1:20" or "2:45"
 
 # Detection settings
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # cars, trucks, buses, motorcycles in COCO dataset
