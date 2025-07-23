@@ -4,7 +4,7 @@ Configuration settings for vehicle detection and tracking system.
 
 # Video processing settings
 DEFAULT_MODEL_PATH = "Detection/yolov8m.pt"
-DEFAULT_INPUT_VIDEO = "Detection/test_footage/7.mp4"
+DEFAULT_INPUT_VIDEO = "Detection/test_footage/5.mp4"
 DEFAULT_OUTPUT_VIDEO = "Detection/annotated_test1.mp4"
 DEFAULT_OUTPUT_CSV = "Detection/traffic_simulation_data.csv"
 
