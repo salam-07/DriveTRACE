@@ -99,7 +99,6 @@ class VehicleTracker:
         detections = self.tracker.update_with_detections(detections)
         
         # Process each tracked vehicle
-        calculate_speed = frame_number % 5 == 0  # Calculate speed every 5th frame
         for confidence, class_id, tracker_id, box in zip(detections.confidence, detections.class_id, detections.tracker_id, detections.xyxy):
             # Get center point of bounding box
             x1, y1, x2, y2 = box.astype(int)
@@ -108,47 +107,44 @@ class VehicleTracker:
             center_point = np.array([center_x, center_y])
             
             if self.point_in_roi(center_point):
-                    # Transform point to bird's eye view
-                    transformed_point = cv2.perspectiveTransform(
-                        np.array([[center_point]], dtype=np.float32),
-                        self.perspective_matrix
-                    )[0][0]
+                # Transform point to bird's eye view
+                transformed_point = cv2.perspectiveTransform(
+                    np.array([[center_point]], dtype=np.float32),
+                    self.perspective_matrix
+                )[0][0]
+                
+                # Store data for every frame
+                if self.vehicle_data[tracker_id]['initial_position'] is None:
+                    self.vehicle_data[tracker_id]['initial_position'] = transformed_point
+                
+                self.vehicle_data[tracker_id]['positions'].append(transformed_point)
+                self.vehicle_data[tracker_id]['frames'].append(frame_number)
+                
+                # Calculate speed if we have at least two positions
+                speed_display = 0  # Speed for video annotation (px/s)
+                speed_simulation = 400  # Speed for CSV simulation (simulation units)
+                
+                if len(self.vehicle_data[tracker_id]['positions']) >= 2:
+                    pos1 = self.vehicle_data[tracker_id]['positions'][-2]
+                    pos2 = self.vehicle_data[tracker_id]['positions'][-1]
+                    frame1 = self.vehicle_data[tracker_id]['frames'][-2]
+                    frame2 = self.vehicle_data[tracker_id]['frames'][-1]
+                    time_diff = (frame2 - frame1) / self.fps
                     
-                    # Store data
-                    if self.vehicle_data[tracker_id]['initial_position'] is None:
-                        self.vehicle_data[tracker_id]['initial_position'] = transformed_point
+                    # Calculate speed in pixels per second for display
+                    distance = np.linalg.norm(pos2 - pos1)
+                    speed_display = int(distance / time_diff) if time_diff > 0 else 0
                     
-                    self.vehicle_data[tracker_id]['positions'].append(transformed_point)
-                    self.vehicle_data[tracker_id]['frames'].append(frame_number)
+                    # Calculate speed for simulation (more reasonable scaling)
+                    speed_simulation = int(speed_display * 2 + 400)  # Much smaller scaling factor
                     
-                    # Store data for every frame
-                    self.vehicle_data[tracker_id]['positions'].append(transformed_point)
-                    self.vehicle_data[tracker_id]['frames'].append(frame_number)
-                    
-                    # Initialize speed
-                    speed = 0 if not self.vehicle_data[tracker_id]['speeds'] else self.vehicle_data[tracker_id]['speeds'][-1]
-                    
-                    # Calculate speed every 5th frame if we have at least two positions
-                    if calculate_speed and len(self.vehicle_data[tracker_id]['positions']) >= 2:
-                        pos1 = self.vehicle_data[tracker_id]['positions'][-2]
-                        pos2 = self.vehicle_data[tracker_id]['positions'][-1]
-                        time_diff = (self.vehicle_data[tracker_id]['frames'][-1] - 
-                                   self.vehicle_data[tracker_id]['frames'][-2]) / self.fps
-                        
-                        # Calculate speed in pixels per second
-                        distance = np.linalg.norm(pos2 - pos1)
-                        speed = distance / time_diff if time_diff > 0 else 0
-                        self.vehicle_data[tracker_id]['speeds'].append(speed)
-                    
-                    # Draw bounding box and ID
-                    label = f"{tracker_id} {self.class_names[class_id]} {confidence:0.2f} Speed: {speed:.1f}px/s"
-                    cv2.rectangle(frame, 
-                                (x1, y1), 
-                                (x2, y2), 
-                                (0, 255, 0), 2)
-                    cv2.putText(frame, label, 
-                              (x1, y1 - 10),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                self.vehicle_data[tracker_id]['speeds'].append(speed_simulation)
+                
+                # Draw bounding box and ID (show display speed, not simulation speed)
+                label = f"ID:{tracker_id} {self.class_names[class_id]} Speed:{speed_display}px/s"
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame, label, (x1, y1 - 10),
+                          cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         
         # Update trace annotator
         frame = self.trace_annotator.annotate(scene=frame.copy(), detections=detections)
@@ -162,31 +158,63 @@ class VehicleTracker:
         print(f"\nProcessing vehicle tracking data...")
         with open(self.output_csv_path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['frame', 'vehicle_id', 'x_position', 'y_position', 
-                           'spawn_x', 'spawn_y', 'relative_x', 'relative_y', 
-                           'speed_px_per_s'])
+            # New CSV format as requested
+            writer.writerow(['frame_id', 'vehicle_id', 'world_x', 'world_y', 'speed', 'action'])
             total_vehicles = len(self.vehicle_data)
             print(f"Processing data for {total_vehicles} vehicles...")
             
             for vehicle_id, data in self.vehicle_data.items():
-                if data['initial_position'] is not None:
+                if data['initial_position'] is not None and len(data['positions']) > 0:
                     for i in range(len(data['positions'])):
                         pos = data['positions'][i]
-                        init_pos = data['initial_position']
-                        relative_pos = pos - init_pos
-                        speed = data['speeds'][i] if i < len(data['speeds']) else 0
+                        frame_id = data['frames'][i]
+                        
+                        # Convert coordinates to simulation world coordinates
+                        # Map bird's eye view coordinates to lane-based system
+                        world_x = int(pos[0] * 2)  # Scale to lane width (assuming 200px lanes)
+                        world_y = int(pos[1] * 5)  # Scale for forward movement
+                        
+                        # Get speed and convert to simulation units
+                        speed = int(data['speeds'][i] * 10) if i < len(data['speeds']) else 400
+                        
+                        # Determine action based on speed and movement patterns
+                        action = self.determine_action(data, i, speed)
                         
                         writer.writerow([
-                            data['frames'][i],
+                            frame_id,
                             vehicle_id,
-                            pos[0],
-                            pos[1],
-                            init_pos[0],
-                            init_pos[1],
-                            relative_pos[0],
-                            relative_pos[1],
-                            speed
+                            world_x,
+                            world_y,
+                            speed,
+                            action
                         ])
+    
+    def determine_action(self, data, index, speed):
+        """Determine vehicle action based on speed and position changes"""
+        actions = ['maintain', 'accelerate', 'swerve', 'speed_violation', 'change_lane', 'dangerous_swerve']
+        
+        # Speed-based actions
+        if speed > 600:
+            return 'speed_violation'
+        elif speed > 500:
+            return 'dangerous_swerve'
+        elif index > 0 and len(data['speeds']) > index:
+            prev_speed = data['speeds'][index-1] if index-1 < len(data['speeds']) else speed
+            if speed > prev_speed * 1.2:
+                return 'accelerate'
+        
+        # Position-based actions (lane changes, swerving)
+        if index > 0 and len(data['positions']) > index:
+            prev_pos = data['positions'][index-1]
+            curr_pos = data['positions'][index]
+            x_change = abs(curr_pos[0] - prev_pos[0])
+            
+            if x_change > 10:  # Significant lateral movement
+                return 'change_lane'
+            elif x_change > 5:
+                return 'swerve'
+        
+        return 'maintain'
 
     def process_video(self):
         frame_number = 0
@@ -223,10 +251,10 @@ class VehicleTracker:
         print(f"Data saved to: {self.output_csv_path}")
 
 def main():
-    video_path = "Detection/test2.mp4"
+    video_path = "Detection/test2.mp4"  # Changed to test2.mp4 as requested
     model_path = "Detection/yolov8m.pt"  # Using medium-sized YOLOv8 model
-    output_video_path = "Detection/annotated_test2.mp4"
-    output_csv_path = "Detection/vehicle_data.csv"
+    output_video_path = "Detection/annotated_test1.mp4"
+    output_csv_path = "Detection/traffic_simulation_data.csv"  # New name for simulation data
     
     # Check if input files exist
     if not Path(video_path).exists():
@@ -236,9 +264,10 @@ def main():
         print(f"Error: YOLO model file not found: {model_path}")
         return
     
-    print(f"Starting vehicle detection and tracking...")
+    print(f"Starting vehicle detection and tracking for simulation data...")
     print(f"Input video: {video_path}")
     print(f"Using YOLO model: {model_path}")
+    print(f"Output CSV will be in simulation format: frame_id,vehicle_id,world_x,world_y,speed,action")
     
     tracker = VehicleTracker(video_path, model_path, output_video_path, output_csv_path)
     tracker.process_video()
