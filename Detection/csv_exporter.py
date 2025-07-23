@@ -4,7 +4,6 @@ CSV export utilities for vehicle tracking data.
 
 import csv
 from coordinate_transformer import CoordinateTransformer
-from speed_calculator import SpeedCalculator
 
 class CSVExporter:
     def __init__(self, output_path):
@@ -27,7 +26,7 @@ class CSVExporter:
         with open(self.output_path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             # Write header
-            writer.writerow(['frame_id', 'vehicle_id', 'world_x', 'world_y', 'speed', 'action'])
+            writer.writerow(['frame_id', 'vehicle_id', 'world_x', 'world_y', 'speed'])
             
             total_vehicles = len(vehicle_data)
             print(f"Processing data for {total_vehicles} vehicles...")
@@ -55,16 +54,12 @@ class CSVExporter:
             # Get speed (already in simulation units)
             speed = data['speeds'][i] if i < len(data['speeds']) else 400
             
-            # Determine action based on speed and movement patterns
-            action = SpeedCalculator.determine_action(data, i, speed)
-            
             writer.writerow([
                 frame_id,
                 vehicle_id,
                 world_x,
                 world_y,
-                speed,
-                action
+                speed
             ])
     
     def validate_data(self, vehicle_data):

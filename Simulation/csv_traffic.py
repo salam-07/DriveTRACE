@@ -5,7 +5,7 @@ import random
 from config import *
 
 class CSVTrafficVehicle:
-    def __init__(self, vehicle_id, world_x, world_y, speed, action="maintain"):
+    def __init__(self, vehicle_id, world_x, world_y, speed):
         # Load random vehicle image
         vehicle_files = [f for f in os.listdir(TRAFFIC_ASSET_DIR) 
                         if f.startswith('car_')]
@@ -24,7 +24,6 @@ class CSVTrafficVehicle:
         self.world_x = world_x  # X position in world coordinates
         self.world_y = world_y
         self.speed = speed
-        self.action = action
         self.target_x = world_x  # Target X position for gradual lane changes
         self.lane_change_speed = 2.0  # Speed of lane changes in pixels per frame
         
@@ -96,30 +95,33 @@ class CSVTrafficManager:
     def initialize_vehicles(self):
         """Initialize vehicles from CSV data"""
         self.vehicles = {}
-        # Get initial frame data (frame 0)
-        initial_frame = self.df[self.df['frame_id'] == 0]
         
-        for _, row in initial_frame.iterrows():
-            vehicle_id = row['vehicle_id']
+        # Get all unique vehicle IDs from the dataset
+        unique_vehicle_ids = self.df['vehicle_id'].unique()
+        
+        # For each vehicle, find its first appearance in the dataset
+        for vehicle_id in unique_vehicle_ids:
+            vehicle_data = self.df[self.df['vehicle_id'] == vehicle_id]
+            first_appearance = vehicle_data.iloc[0]  # Get the first row for this vehicle
+            
             # Create vehicles with spread out positions around the player
             random_offset = random.uniform(-800, 1500)  # Spread vehicles around player
             
             # Handle both new world_x format and old lane format
-            if 'world_x' in row:
-                world_x = row['world_x']
-                world_y = row.get('world_y', random_offset)
+            if 'world_x' in first_appearance:
+                world_x = first_appearance['world_x']
+                world_y = first_appearance.get('world_y', random_offset)
             else:
                 # Convert lane to world_x coordinate
-                lane = row['lane']
+                lane = first_appearance['lane']
                 world_x = (lane * LANE_WIDTH) + (LANE_WIDTH / 2)
-                world_y = row.get('world_y', random_offset)
+                world_y = first_appearance.get('world_y', random_offset)
             
             self.vehicles[vehicle_id] = CSVTrafficVehicle(
                 vehicle_id=vehicle_id,
                 world_x=world_x,
                 world_y=world_y,
-                speed=row['speed'],
-                action=row['action']
+                speed=first_appearance['speed']
             )
     
     def update(self, player_speed, player_lane, player_world_y):
@@ -144,7 +146,6 @@ class CSVTrafficManager:
             if vehicle_id in self.vehicles:
                 # Update speed
                 self.vehicles[vehicle_id].target_speed = row['speed']
-                self.vehicles[vehicle_id].action = row['action']
                 
                 # Handle both new world_x format and old lane format
                 if 'world_x' in row:

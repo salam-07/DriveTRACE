@@ -192,7 +192,7 @@ class VehicleTracker:
         print(f"Starting vehicle detection and tracking for simulation data...")
         print(f"Input video: {self.video_path}")
         print(f"Using YOLO model: {self.model_path}")
-        print(f"Output CSV format: frame_id,vehicle_id,world_x,world_y,speed,action")
+        print(f"Output CSV format: frame_id,vehicle_id,world_x,world_y,speed")
         
         # Process video
         with self.video_processor:
