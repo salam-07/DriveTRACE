@@ -1,75 +1,23 @@
 Timestamp,Warning_Type,Warning_Message,Player_Speed,Player_X,Player_Y
-2025-07-23 10:10:34.857,STOPPED,Stopped: Safely pull over to the left if you want to stop.,0,650.0,0.0
-2025-07-23 10:10:35.953,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:36.362,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:36.546,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:36.676,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:36.792,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.070,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.167,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.265,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.381,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.478,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.689,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.869,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:37.968,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.067,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.165,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.265,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.380,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.496,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.596,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.692,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:38.807,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:39.037,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:39.151,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:39.660,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:39.809,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.074,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.206,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.337,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.472,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.621,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:40.767,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.066,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.232,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.397,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.549,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.713,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:41.912,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.092,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.289,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.458,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.619,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.803,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
-2025-07-23 10:10:42.951,SLOW_DRIVING,Driving slow on highways isn't safe.,1.1666666666666667,650.0,0.019444444444444445
-2025-07-23 10:10:42.984,PROXIMITY,Too close to traffic! Maintain safe distance.,3.5,650.0,0.11666666666666667
-2025-07-23 10:10:43.151,PROXIMITY,Too close to traffic! Maintain safe distance.,15.166666666666664,650.0,1.7694444444444444
-2025-07-23 10:10:43.330,PROXIMITY,Too close to traffic! Maintain safe distance.,28.00000000000001,650.0,5.833333333333333
-2025-07-23 10:10:43.511,PROXIMITY,Too close to traffic! Maintain safe distance.,40.83333333333333,650.0,12.250000000000002
-2025-07-23 10:10:43.710,PROXIMITY,Too close to traffic! Maintain safe distance.,54.8333333333333,650.0,21.933333333333334
-2025-07-23 10:10:43.889,PROXIMITY,Too close to traffic! Maintain safe distance.,67.66666666666663,650.0,33.26944444444444
-2025-07-23 10:10:44.067,PROXIMITY,Too close to traffic! Maintain safe distance.,80.50000000000001,650.0,46.95833333333332
-2025-07-23 10:10:44.249,PROXIMITY,Too close to traffic! Maintain safe distance.,93.3333333333334,650.0,62.99999999999999
-2025-07-23 10:10:44.430,PROXIMITY,Too close to traffic! Maintain safe distance.,106.16666666666679,650.0,81.39444444444445
-2025-07-23 10:10:44.628,PROXIMITY,Too close to traffic! Maintain safe distance.,120.16666666666684,650.0,104.14444444444447
-2025-07-23 10:10:44.826,PROXIMITY,Too close to traffic! Maintain safe distance.,134.16666666666683,650.0,129.6944444444445
-2025-07-23 10:10:45.005,PROXIMITY,Too close to traffic! Maintain safe distance.,147.00000000000006,650.0,155.57500000000013
-2025-07-23 10:10:45.171,PROXIMITY,Too close to traffic! Maintain safe distance.,158.66666666666663,650.0,181.14444444444453
-2025-07-23 10:10:45.354,PROXIMITY,Too close to traffic! Maintain safe distance.,171.49999999999986,650.0,211.51666666666677
-2025-07-23 10:10:45.518,PROXIMITY,Too close to traffic! Maintain safe distance.,183.16666666666643,650.0,241.16944444444448
-2025-07-23 10:10:45.683,PROXIMITY,Too close to traffic! Maintain safe distance.,194.833333333333,650.0,272.7666666666666
-2025-07-23 10:10:45.864,PROXIMITY,Too close to traffic! Maintain safe distance.,207.66666666666623,650.0,309.7694444444443
-2025-07-23 10:10:46.044,PROXIMITY,Too close to traffic! Maintain safe distance.,220.49999999999946,650.0,349.1249999999999
-2025-07-23 10:10:46.206,PROXIMITY,Too close to traffic! Maintain safe distance.,232.16666666666603,650.0,386.94444444444423
-2025-07-23 10:10:46.422,PROXIMITY,Too close to traffic! Maintain safe distance.,247.33333333333258,650.0,439.01666666666614
-2025-07-23 10:10:46.470,OVERSPEEDING,Overspeeding! Slow down to avoid accidents.,250.83333333333255,650.0,451.49999999999943
-2025-07-23 10:10:46.586,PROXIMITY,Too close to traffic! Maintain safe distance.,258.9999999999992,650.0,481.3083333333327
-2025-07-23 10:10:46.782,PROXIMITY,Too close to traffic! Maintain safe distance.,272.99999999999943,631.6995473037426,530.7010420507238
-2025-07-23 10:10:46.963,PROXIMITY,Too close to traffic! Maintain safe distance.,285.833333333333,607.1522144107629,575.784737096187
-2025-07-23 10:10:47.143,PROXIMITY,Too close to traffic! Maintain safe distance.,298.6666666666665,581.4797954268547,622.9347681645673
-2025-07-23 10:10:47.308,PROXIMITY,Too close to traffic! Maintain safe distance.,310.33333333333337,557.1649183377856,667.5915342796759
-2025-07-23 10:10:47.491,PROXIMITY,Too close to traffic! Maintain safe distance.,323.1666666666669,529.3446077257419,718.6863886645344
-2025-07-23 10:10:47.655,PROXIMITY,Too close to traffic! Maintain safe distance.,327.83333333333366,503.24447006263756,766.6219689647678
-2025-07-23 10:10:47.657,SWERVING,Swerving detected! Please keep your lane on highways.,327.83333333333366,503.24447006263756,766.6219689647678
-2025-07-23 10:10:47.670,COLLISION,COLLISION! Vehicle contact detected!,329.00000000000034,500.6223685945238,771.4377272991695
+2025-07-23 11:10:31.122,STOPPED,Stopped: Safely pull over to the left if you want to stop.,0,650.0,0.0
+2025-07-23 11:10:31.910,PROXIMITY,Too close to traffic! Maintain safe distance.,0,650.0,0.0
+2025-07-23 11:10:32.191,SLOW_DRIVING,Driving slow on highways isn't safe.,1.1666666666666667,650.0,0.019444444444444445
+2025-07-23 11:10:32.753,PROXIMITY,Too close to traffic! Maintain safe distance.,40.83333333333333,650.0,12.250000000000002
+2025-07-23 11:10:33.298,PROXIMITY,Too close to traffic! Maintain safe distance.,79.33333333333334,650.0,45.61666666666665
+2025-07-23 11:10:33.823,PROXIMITY,Too close to traffic! Maintain safe distance.,116.66666666666683,650.0,98.19444444444447
+2025-07-23 11:10:34.315,PROXIMITY,Too close to traffic! Maintain safe distance.,151.66666666666669,650.0,165.56944444444454
+2025-07-23 11:10:34.828,PROXIMITY,Too close to traffic! Maintain safe distance.,187.83333333333306,650.0,253.57500000000005
+2025-07-23 11:10:35.337,PROXIMITY,Too close to traffic! Maintain safe distance.,205.33333333333292,650.0,357.77777777777754
+2025-07-23 11:10:35.850,PROXIMITY,Too close to traffic! Maintain safe distance.,206.49999999999957,650.0,464.1777777777774
+2025-07-23 11:10:36.378,PROXIMITY,Too close to traffic! Maintain safe distance.,206.49999999999957,650.0,573.999999999999
+2025-07-23 11:10:36.924,PROXIMITY,Too close to traffic! Maintain safe distance.,205.33333333333292,650.0,687.2444444444424
+2025-07-23 11:10:37.483,PROXIMITY,Too close to traffic! Maintain safe distance.,214.66666666666617,650.0,804.5527777777746
+2025-07-23 11:10:37.999,OVERSPEEDING,Overspeeding! Slow down to avoid accidents.,250.83333333333255,650.0,925.10833333333
+2025-07-23 11:10:38.047,PROXIMITY,Too close to traffic! Maintain safe distance.,254.33333333333252,650.0,937.7666666666632
+2025-07-23 11:10:38.606,PROXIMITY,Too close to traffic! Maintain safe distance.,293.9999999999998,650.0,1093.4583333333294
+2025-07-23 11:10:39.169,PROXIMITY,Too close to traffic! Maintain safe distance.,333.6666666666671,650.0,1271.6277777777739
+2025-07-23 11:10:39.712,PROXIMITY,Too close to traffic! Maintain safe distance.,370,650.0,1465.9999999999966
+2025-07-23 11:10:40.258,PROXIMITY,Too close to traffic! Maintain safe distance.,370,650.0,1669.499999999999
+2025-07-23 11:10:40.849,PROXIMITY,Too close to traffic! Maintain safe distance.,370,587.891225090999,1868.777180061021
+2025-07-23 11:10:41.427,PROXIMITY,Too close to traffic! Maintain safe distance.,370,435.2740114849016,2021.3943936671194
+2025-07-23 11:10:41.459,COLLISION,COLLISION! Vehicle contact detected!,370,426.55302785026754,2030.1153773017536
