@@ -15,11 +15,14 @@ from csv_exporter import CSVExporter
 from video_processor import VideoProcessor
 
 class VehicleTracker:
-    def __init__(self, video_path, model_path, output_video_path, output_csv_path):
+    def __init__(self, video_path, model_path, output_video_path, output_csv_path, 
+                 start_time=None, end_time=None):
         self.video_path = video_path
         self.model_path = model_path
         self.output_video_path = output_video_path
         self.output_csv_path = output_csv_path
+        self.start_time = start_time
+        self.end_time = end_time
         
         # Initialize components
         self.model = None
@@ -58,7 +61,12 @@ class VehicleTracker:
         self.class_names = self.model.model.names
         
         # Initialize video processor
-        self.video_processor = VideoProcessor(self.video_path, self.output_video_path)
+        self.video_processor = VideoProcessor(
+            self.video_path, 
+            self.output_video_path,
+            start_time=self.start_time,
+            end_time=self.end_time
+        )
         self.video_processor.initialize()
         
         # Initialize coordinate transformer

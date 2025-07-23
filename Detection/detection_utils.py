@@ -73,6 +73,83 @@ def format_time(seconds):
         secs = seconds % 60
         return f"{hours}h {minutes}m {secs:.1f}s"
 
+def parse_time_string(time_string):
+    """
+    Parse time string in format "MM:SS" or "H:MM:SS" to seconds.
+    
+    Args:
+        time_string: Time in format "MM:SS" (e.g., "1:20") or "H:MM:SS" (e.g., "1:05:30")
+        
+    Returns:
+        float: Time in seconds
+        
+    Raises:
+        ValueError: If time string format is invalid
+    """
+    if not time_string:
+        return None
+    
+    try:
+        parts = time_string.split(':')
+        
+        if len(parts) == 2:  # MM:SS format
+            minutes, seconds = map(float, parts)
+            return minutes * 60 + seconds
+        elif len(parts) == 3:  # H:MM:SS format
+            hours, minutes, seconds = map(float, parts)
+            return hours * 3600 + minutes * 60 + seconds
+        else:
+            raise ValueError("Time format must be MM:SS or H:MM:SS")
+    except ValueError as e:
+        raise ValueError(f"Invalid time format '{time_string}': {e}")
+
+def format_seconds_to_time(seconds):
+    """
+    Format seconds back to MM:SS or H:MM:SS format.
+    
+    Args:
+        seconds: Time in seconds
+        
+    Returns:
+        str: Formatted time string
+    """
+    if seconds < 3600:  # Less than 1 hour
+        minutes = int(seconds // 60)
+        secs = int(seconds % 60)
+        return f"{minutes}:{secs:02d}"
+    else:  # 1 hour or more
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = int(seconds % 60)
+        return f"{hours}:{minutes:02d}:{secs:02d}"
+
+def validate_time_range(start_time, end_time, video_duration):
+    """
+    Validate that time range is valid for video duration.
+    
+    Args:
+        start_time: Start time in seconds
+        end_time: End time in seconds
+        video_duration: Total video duration in seconds
+        
+    Returns:
+        tuple: (validated_start, validated_end, is_valid)
+    """
+    if start_time is None:
+        start_time = 0
+    if end_time is None:
+        end_time = video_duration
+    
+    # Validate bounds
+    start_time = max(0, start_time)
+    end_time = min(video_duration, end_time)
+    
+    # Ensure start < end
+    if start_time >= end_time:
+        return start_time, end_time, False
+    
+    return start_time, end_time, True
+
 class ProgressTracker:
     """Simple progress tracking utility."""
     

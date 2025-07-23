@@ -8,6 +8,15 @@ DEFAULT_INPUT_VIDEO = "Detection/test1.mp4"
 DEFAULT_OUTPUT_VIDEO = "Detection/annotated_test1.mp4"
 DEFAULT_OUTPUT_CSV = "Detection/traffic_simulation_data.csv"
 
+# Time range settings for video processing
+# Set to None to process entire video, or specify in seconds
+START_TIME_SECONDS = None  # Start time in seconds (e.g., 30 for 0:30)
+END_TIME_SECONDS = None    # End time in seconds (e.g., 80 for 1:20)
+
+# Alternative: specify time ranges as "MM:SS" format
+START_TIME_STRING = "1:00"   # e.g., "0:30" or "1:15"
+END_TIME_STRING = "1:20"     # e.g., "1:20" or "2:45"
+
 # Detection settings
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # cars, trucks, buses, motorcycles in COCO dataset
 
