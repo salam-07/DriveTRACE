@@ -24,3 +24,5 @@ Simulation/Logs/driving_warnings.csv
 Simulation/Logs/driving_warnings.csv
 Simulation/Logs/driving_warnings.csv
 Simulation/__pycache__/player.cpython-313.pyc
+/__pycache__/
+/Logs/
